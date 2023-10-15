@@ -1,0 +1,52 @@
+<div class="form-signup__container">
+    <main class="form-signup w-100 m-auto text-center">
+        <form>
+        <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
+
+        <div class="form-floating">
+            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
+            <label for="floatingInput">Email address</label>
+        </div>
+        <div class="form-floating">
+            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
+            <label for="floatingPassword">Password</label>
+        </div>
+
+        <div class="checkbox mb-3">
+            <label>
+            <input type="checkbox" value="remember-me"> Remember me
+            </label>
+        </div>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
+        <p class="mt-5 mb-3 text-muted">© 2017–2022</p>
+        </form>
+    </main>
+</div>
+
+<style>
+    .form-signup__container{
+        display: flex;
+        align-items: center;
+    }
+
+    .form-signup {
+        max-width: 450px;
+        padding: 15px;
+    }
+
+    .form-signup .form-floating:focus-within {
+        z-index: 2;
+    }
+
+    .form-signup input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+
+    .form-signup input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+    }
+</style>
