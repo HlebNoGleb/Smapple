@@ -1,26 +1,93 @@
+<script>
+    import { goto } from "$app/navigation";
+    import Swal from 'sweetalert2'
+    import { config } from '$lib/config';
+
+    let signUp = {
+        email: "",
+        password: "",
+        nickname: ""
+    }
+
+    async function auth() {
+
+        // add jwt logic
+
+        let validation = true;
+
+        Object.values(signUp).forEach(item => {
+            if (!item){
+                Swal.fire({
+                    title: 'Oups...',
+                    text: 'All fields must be filled in',
+                    icon: 'error',
+                    confirmButtonText: 'ok'
+                });
+
+                validation = false;
+                return;
+            }
+        });
+
+        if (!validation) {
+            return;
+        }
+
+        await fetch(`${config.mainUrl}/signup`, {
+            method: 'post',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(signUp)
+        })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (result) {
+            console.log('Request failed', result);
+            Swal.fire({
+                title: 'Success',
+                text: 'Сonfirm your account by email',
+                icon: 'success',
+                confirmButtonText: 'ok',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    goto('/calendar');
+                }
+            })
+        })
+        .catch (function (error) {
+            console.log('Request failed', error);
+            Swal.fire({
+                title: 'Oups...',
+                text: 'Something went wrong',
+                icon: 'error',
+                confirmButtonText: 'ok'
+            })
+        });
+    }
+</script>
+
 <div class="form-signup__container">
-    <main class="form-signup w-100 m-auto text-center">
-        <form>
-        <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
-
-        <div class="form-floating">
-            <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-            <label for="floatingInput">Email address</label>
-        </div>
-        <div class="form-floating">
-            <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-            <label for="floatingPassword">Password</label>
-        </div>
-
-        <div class="checkbox mb-3">
-            <label>
-            <input type="checkbox" value="remember-me"> Remember me
-            </label>
-        </div>
-        <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-        <p class="mt-5 mb-3 text-muted">© 2017–2022</p>
-        </form>
-    </main>
+        <main class="form-signup w-100 m-auto text-center">
+            <h1 class="h3 mb-3 fw-normal">Please sign up</h1>
+            <form on:submit|preventDefault={auth}>
+                <div class="form-floating">
+                    <input bind:value={signUp.nickname} type="text" class="form-control" id="login" placeholder="">
+                    <label for="login">Login</label>
+                </div>
+                <div class="form-floating">
+                    <input bind:value={signUp.email} type="email" class="form-control" id="email" placeholder="name@example.com">
+                    <label for="email">Email address</label>
+                </div>
+                <div class="form-floating">
+                    <input bind:value={signUp.password} type="password" class="form-control" id="password" placeholder="Password">
+                    <label for="password">Password</label>
+                </div>
+                <button class="w-100 btn btn-lg btn-primary" type="submit">Sign Up</button>
+            </form>
+        </main>
 </div>
 
 <style>
@@ -38,15 +105,22 @@
         z-index: 2;
     }
 
-    .form-signup input[type="email"] {
-        margin-bottom: -1px;
+    .form-floating input{
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
         border-bottom-right-radius: 0;
         border-bottom-left-radius: 0;
     }
 
-    .form-signup input[type="password"] {
+    .form-floating:nth-of-type(1) input {
+        margin-bottom: -1px;
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+    }
+
+    .form-floating:nth-last-of-type(1) input {
         margin-bottom: 10px;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
+        border-bottom-right-radius: 6px;
+        border-bottom-left-radius: 6px;
     }
 </style>
