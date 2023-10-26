@@ -1,3 +1,8 @@
+:root{
+    --form-control-border-color: red;
+    --form-control-color-major: blue;
+    --form-control-disabled: green
+}
 body{
     min-height: 100svh;
 }
