@@ -4,7 +4,7 @@
 
     onMount(() => {
         if (false) { // check auth
-            goto('/calendar');
+            goto('/games');
         }
     });
 

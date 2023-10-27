@@ -30,6 +30,27 @@
         name: "",
         email:"",
         description:"",
+        points: 100,
+    }
+
+    function addToGame(game, user) {
+      alert(`добавить пользователя ${user} в игру ${game}`)
+    }
+
+    function removeFromGame(game, user) {
+      alert(`удалить пользователя ${user} из игры ${game}`)
+    }
+
+    function removeFromGameApplication(game, user) {
+      alert(`удалить заявку пользователя ${user} из игры ${game}`)
+    }
+
+    function acceptHost(user) {
+      alert(`принять пользователя ${user} как хоста`)
+    }
+
+    function declineHost(user) {
+      alert(`отказать пользователю ${user} как хосту`)
     }
 </script>
 
@@ -41,6 +62,7 @@
       <div class="container">
 
             <h1 class="text-body-emphasis">{data.name}</h1>
+            <h1 class="text-body-emphasis">Очки: 100</h1>
             <p class="fs-5 col-md-8">{data.email}</p>
             <hr class="col-3 col-md-2 mb-5">
             <div class="my-3">
@@ -56,10 +78,10 @@
           <div class="col-md-6">
             <h2 class="text-body-emphasis">Список игр в которых он учавствовал</h2>
             <ul class="list-unstyled ps-0">
-              {#each [1,2,3,4] as item}
+              {#each [1,2,3,4] as game}
               <li>
-                <a class="mb-1" href="/games/{item}">
-                  Game {item}
+                <a class="mb-1" href="/games/{game}">
+                  Game {game}
                 </a>
               </li>
               {/each}
@@ -68,12 +90,63 @@
           <div class="col-md-6">
             <h2 class="text-body-emphasis">Список игр в которые он подал заявки</h2>
             <ul class="list-unstyled ps-0">
-              {#each [1,2,3,4] as item}
+              {#each [1,2,3,4] as game}
               <li>
-                <a class="mb-1" href="/games/{item}">
-                  Game {item}
+                <a class="mb-1" href="/games/{game}">
+                  Game {game}
                 </a>
+                <button type="button" class="btn btn-danger" on:click={() => {removeFromGameApplication(game, $page.params.user)}}>
+                  Удалить заявку
+                </button>
               </li>
+              {/each}
+            </ul>
+          </div>
+        </div>
+        <h1>Если пользователь хост</h1>
+        <div class="row g-5 my-3">
+          <div class="col-md-12">
+            <h2 class="text-body-emphasis">Список игр в которых он хост</h2>
+            <ul class="list-unstyled ps-0">
+              {#each [1,2,3,4] as game}
+              <li>
+                <a class="mb-1" href="/games/{game}">
+                  hosted game {game}
+                </a>
+                <ul class="list-unstyled ps-0">
+                  {#each [1,2,3,4] as user}
+                  <li>
+                    <a class="mb-1" href="/user/{user}"> users {user} </a>
+                    <button type="button" class="btn btn-primary" on:click={() => {addToGame(game, user)}}>
+                      Принять игрока
+                    </button>
+                    <button type="button" class="btn btn-danger" on:click={() => {removeFromGame(game, user)}}>
+                      Удалить игрока
+                    </button>
+                  </li>
+                  {/each}
+                </ul>
+              </li>
+              <hr>
+              {/each}
+            </ul>
+          </div>
+        </div>
+        <h1>Если пользователь админ</h1>
+        <div class="row g-5 my-3">
+          <div class="col-md-12">
+            <h2 class="text-body-emphasis">Список заявок на хоста </h2>
+            <ul class="list-unstyled ps-0">
+              {#each [1,2,3,4] as user}
+                  <li>
+                    <a class="mb-1" href="/user/{user}"> users {user} </a>
+                    <button type="button" class="btn btn-primary" on:click={() => {acceptHost(user)}}>
+                      Принять хоста
+                    </button>
+                    <button type="button" class="btn btn-danger" on:click={() => {declineHost(user)}}>
+                      Удалить хоста
+                    </button>
+                  </li>
               {/each}
             </ul>
           </div>
