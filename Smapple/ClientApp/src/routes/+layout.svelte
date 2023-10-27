@@ -12,7 +12,7 @@
           <div class="collapse navbar-collapse" id="navbarsExample03">
             <ul class="navbar-nav me-auto mb-2 mb-sm-0">
               <li class="nav-item">
-                <a class="nav-link" href="/">Account</a>
+                <a class="nav-link" href="/users/1">Account</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/games">Games</a>
@@ -32,4 +32,4 @@
         </div>
       </nav>
 
-        <slot></slot>
+      <slot></slot>
