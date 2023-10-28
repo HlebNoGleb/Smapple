@@ -1,5 +1,6 @@
 export async function load({ fetch }) {
-	const res = await fetch('https://jsonplaceholder.typicode.com/photos?_limit=10');
-    let gamesArray = await res.json();
+	const res = await fetch('/api/game');
+    console.log(res);
+    let gamesArray = await res.text();
 	return {games:gamesArray}
 }
