@@ -95,7 +95,7 @@
     <p>...waiting</p>
 {:then data}
     <main>
-        <div class="game" style="background:linear-gradient(0deg, rgba(0,0,0,.5), rgba(0,0,0,.5)), url(https://pbs.twimg.com/media/FQ-TyYnXIAcR0uu.jpg:medium);">
+        <div class="game" style="background:linear-gradient(0deg, rgba(0,0,0,.7), rgba(0,0,0,.7)), url(https://pbs.twimg.com/media/FQ-TyYnXIAcR0uu.jpg:medium);">
       <div class="container">
 
             <h1 class="text-body-emphasis">Название игры</h1>

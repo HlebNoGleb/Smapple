@@ -1,8 +1,13 @@
 <script>
+// @ts-nocheck
+
+  export let data;
+
+  console.log(data);
   let promise = getData();
 
   async function getData() {
-    const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=4`);
+    const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=10`);
 
     if (res.ok) {
       return res.json();
@@ -32,21 +37,23 @@
   }
 </script>
 
-<div class="container">
-  {#await promise}
+<div class="px-lg-5 px-2">
+<div class="container-fluid p-lg-4 p-3 rounded substrate">
+  <!-- {#await promise}
     <p>...waiting</p>
-{:then data}
-<div class="my-3">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Добавить игру
-  </button>
-</div>
-    <div class="row row-cols-sm-2 row-cols-md-3 g-4 my-3">
-        {#each data as item}
+  {:then data} -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Игры Smapple</h2>
+      <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Добавить игру
+      </button>
+    </div>
+    <div class="row row-cols-1 row-cols-xxl-5 row-cols-xl-4 row-cols-md-3 row-cols-sm-2 g-3">
+        {#each data.games as item}
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        Название игры
+                        {item.title}
                       </div>
                       <img src="{item.thumbnailUrl}" class="card-img-bottom" alt="{item.id} - {item.title}">
                       <div class="card-body">
@@ -54,10 +61,22 @@
                             <h5 class="card-title">{item.title}</h5>
                             <p class="card-text">Имя хоста</p>
                         </div>
-                        <a href="/games/{item.id}" class="btn btn-primary">Подробнее</a>
+                        <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+                          <a href="/games/{item.id}" class="btn btn-light">Подробнее</a>
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                              Игроки
+                            </button>
+                            <ul class="dropdown-menu">
+                              {#each [1,2,3,4,5,6] as user}
+                                <li><a class="dropdown-item" href="/users/{user}">Username {user}</a></li>
+                              {/each}
+                            </ul>
+                          </div>
+                        </div>
                       </div>
                       <div class="card-footer text-muted">
-                        Дата игры
+                        Дата игры: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
                       </div>
                 </div>
             </div>
@@ -68,18 +87,19 @@
         Добавить игру
       </button>
     </div>
-{:catch error}
+<!-- {:catch error}
     <p style="color: red">{error.message}</p>
-{/await}
+{/await} -->
+</div>
 </div>
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div class="modal-content substrate">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h1 class="modal-title fs-5" id="exampleModalLabel">Добавление игры</h1>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
             <form id="addform" on:submit|preventDefault={submit}>
@@ -122,8 +142,8 @@
                   </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
                   </div>
               </form>
         </div>
