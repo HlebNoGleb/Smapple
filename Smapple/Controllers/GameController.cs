@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Smapple.DbContext;
 using Smapple.Extensions;
 using Smapple.Models;
@@ -33,7 +34,15 @@ public class GameController : Controller
     [HttpGet]
     public async Task<ActionResult> ListGames()
     {
-        var games = _db.Games.OrderByDescending(x => x.Id).ToList();
+        var games = _db.Games
+            .Include(x => x.Host)
+            .Include(x => x.Users)
+            .OrderByDescending(x => x.Id).ToList();
+
+        foreach (var game in games)
+        {
+            game.Host.Password = string.Empty;
+        }
 
         return Json(games);
     }
@@ -71,5 +80,53 @@ public class GameController : Controller
         }
         
     }
+
+    [HttpPost]
+    [Authorize]
+    [Route("{id}/start")]
+    public async Task<ActionResult> StartGame(int id)
+    {
+        try
+        {
+            var hostId = User.Id();
+
+            await ChangeGameStatus(id, hostId, GameStatusEnum.InProgress);
+
+            return Ok();
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
     
+    [HttpPost]
+    [Authorize]
+    [Route("{id}/counting")]
+    public async Task<ActionResult> CountringGameResults(int id)
+    {
+        try
+        {
+            var hostId = User.Id();
+
+            await ChangeGameStatus(id, hostId, GameStatusEnum.CountingResults);
+
+            return Ok();
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+
+    private async Task ChangeGameStatus(int id, int hostId, GameStatusEnum gameStatus)
+    {
+        var game = await _db.Games.SingleAsync(x => x.Id == id && x.HostId == hostId);
+
+        game.Status = gameStatus;
+
+        _db.Games.Update(game);
+
+        await _db.SaveChangesAsync();
+    }
 }

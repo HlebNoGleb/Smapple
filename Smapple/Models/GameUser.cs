@@ -9,6 +9,8 @@ public class GameUser
     public int GameId { get; set; }
 
     public int UserId { get; set; }
+    
+    public int UserScore { get; set; }
 
     public DateTime CreatedDate { get; set; }
     
