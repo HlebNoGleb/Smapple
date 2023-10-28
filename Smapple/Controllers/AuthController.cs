@@ -42,5 +42,14 @@ public class AuthController : Controller
             return Unauthorized();
         }
     }
-    
+
+    [HttpPost]
+    [Route("api/register")]
+    public async Task<ActionResult> Register(User user)
+    {
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync();
+
+        return Ok();
+    }
 }
