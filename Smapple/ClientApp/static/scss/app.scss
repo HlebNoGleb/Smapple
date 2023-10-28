@@ -1,0 +1,18 @@
+$primary: rgb(17, 24, 39);
+$light: rgb(55, 65, 81);
+$card-bg:$primary;
+$card-color: #fff;
+$card-cap-color:$card-color;
+$accordion-bg: $primary;
+$accordion-color:#fff;
+$accordion-button-active-bg: $primary;
+$accordion-button-active-color: #fff;
+$accordion-button-focus-box-shadow: none;
+$accordion-button-focus-border-color: $primary;
+$accordion-border-color: $primary;
+$dropdown-color: #fff;
+$dropdown-bg: $primary;
+$dropdown-link-color:#fff;
+$dropdown-link-hover-color:#fff;
+$dropdown-link-hover-bg:$light;
+@import "../../node_modules/bootstrap/scss/bootstrap.scss";

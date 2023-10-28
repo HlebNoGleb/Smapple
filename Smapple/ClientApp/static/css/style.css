@@ -1,8 +1,41 @@
 :root{
-    --form-control-border-color: red;
-    --form-control-color-major: blue;
-    --form-control-disabled: green
+    --bg-color: rgb(17, 24, 39);
+    --bs-dark-rgb: rgb(17, 24, 39);
+    --form-control-bg: rgb(31, 41, 55);
+    --form-control-bg-focus: rgb(55, 70, 90);
 }
 body{
     min-height: 100svh;
+    background-color: var(--bg-color);
+    color: #fff;
+}
+
+.modal{
+    color: #fff;
+}
+
+.substrate{
+    background-color: var(--form-control-bg-focus);
+}
+
+.form-control{
+    background-color: var(--form-control-bg);
+    color: #fff;
+    border: var(--form-control-bg-focus);
+}
+
+.form-control:focus{
+    background-color: var(--form-control-bg-focus);
+    color: #fff;
+}
+
+.card-header{
+    overflow:hidden;
+    display:inline-block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+h2{
+    color: #fff;
 }
