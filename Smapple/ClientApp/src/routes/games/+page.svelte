@@ -1,39 +1,53 @@
 <script>
 // @ts-nocheck
+  import { invalidate } from '$app/navigation';
+  import Swal from 'sweetalert2'
 
   export let data;
 
-  console.log(data);
-  let promise = getData();
 
-  async function getData() {
-    const res = await fetch(`https://jsonplaceholder.typicode.com/photos?_limit=10`);
-
-    if (res.ok) {
-      return res.json();
-    } else {
-      throw new Error("error");
-    }
-  }
+  console.log(data)
 
   function update() {
-    promise = getData();
+    invalidate();
   }
 
-  function submit() {
+  async function submit() {
     alert(JSON.stringify(addGameForm));
     // send to server
     // if 200ok
+    const rawResponse = await fetch('/api/game', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNjk4NTM0Mjc3LCJleHAiOjE2OTkxMzkwNzcsImlhdCI6MTY5ODUzNDI3N30.6Xw2iJbnPR8_GDd9TQMjoMGT2g7NyREKaSA_RlMiMhhTB2P87lKEftGAa3dGJQQY3-IAHvEqKSscokzX1k-BdQ`
+      },
+      body: JSON.stringify(addGameForm)
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}.`);
+      if (respomse.code == 401) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Do you want to continue',
+          icon: 'error',
+          confirmButtonText: 'Cool'
+        })
+      }
+    }
+
     update()
   }
 
   let addGameForm = {
-      title: "",
-      datetime: null,
-      slots: 0,
+      name: "",
+      gameDateTime: null,
+      slotsCount: 0,
       address: "",
       type: "0",
-      imageUrl: ""
+      image: ""
   }
 </script>
 
@@ -44,7 +58,7 @@
   {:then data} -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Игры Smapple</h2>
-      <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#addGame">
         Добавить игру
       </button>
     </div>
@@ -52,38 +66,41 @@
         {#each data.games as item}
             <div class="col">
                 <div class="card">
-                    <div class="card-header">
-                        {item.title}
-                      </div>
-                      <img src="{item.thumbnailUrl}" class="card-img-bottom" alt="{item.id} - {item.title}">
+
+                      <img src="{item.image}" class="card-img-bottom" alt="{item.id} - {item.name}">
                       <div class="card-body">
                         <div class="my-2">
-                            <h5 class="card-title">{item.title}</h5>
-                            <p class="card-text">Имя хоста</p>
+                            <h5 class="card-title">{item.name}</h5>
+                            <a href="/users/{item?.host?.id}" class="card-text">Хост: {item?.host?.username}</a>
                         </div>
                         <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                           <a href="/games/{item.id}" class="btn btn-light">Подробнее</a>
-                          <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                              Игроки
-                            </button>
-                            <ul class="dropdown-menu">
-                              {#each [1,2,3,4,5,6] as user}
-                                <li><a class="dropdown-item" href="/users/{user}">Username {user}</a></li>
-                              {/each}
-                            </ul>
-                          </div>
+                          {#if item?.users}
+                            <div class="btn-group" role="group">
+                              <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                Игроки {item.users.length} / {item.slotsCount}
+                              </button>
+                                <ul class="dropdown-menu">
+                                  {#each item?.users as user}
+                                    <li><a class="dropdown-item" href="/users/{user.id}">{user.nickname}</a></li>
+                                  {/each}
+                                </ul>
+                            </div>
+                          {/if}
                         </div>
                       </div>
                       <div class="card-footer text-muted">
-                        Дата игры: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}
+                        Дата игры: {new Date(item.gameDateTime).toLocaleDateString()} {new Date(item.gameDateTime).toLocaleTimeString()}
+                      </div>
+                      <div class="card-footer text-muted">
+                        {item.address}
                       </div>
                 </div>
             </div>
         {/each}
     </div>
     <div class="my-3">
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGame">
         Добавить игру
       </button>
     </div>
@@ -94,11 +111,11 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="addGame" tabindex="-1" aria-labelledby="addGameLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content substrate">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Добавление игры</h1>
+          <h1 class="modal-title fs-5" id="addGameLabel">Добавление игры</h1>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
@@ -106,17 +123,17 @@
                 <div class="row g-3">
                   <div class="col-sm-6">
                     <label for="title" class="form-label">Название игры</label>
-                    <input bind:value={addGameForm.title} type="text" class="form-control" id="title" placeholder="" >
+                    <input bind:value={addGameForm.name} type="text" class="form-control" id="title" placeholder="" >
                   </div>
 
                   <div class="col-sm-6">
                     <label for="datetime" class="form-label">Дата и время</label>
-                    <input bind:value={addGameForm.datetime} type="datetime-local" class="form-control" id="datetime" placeholder="" >
+                    <input bind:value={addGameForm.gameDateTime} type="datetime-local" class="form-control" id="datetime" placeholder="" >
                   </div>
 
                   <div class="col-12">
                     <label for="slots" class="form-label">Кол-во мест</label>
-                    <input bind:value={addGameForm.slots} type="number" class="form-control" id="slots" placeholder="" >
+                    <input bind:value={addGameForm.slotsCount} type="number" class="form-control" id="slots" placeholder="" >
                   </div>
 
                   <div class="col-12">
@@ -126,11 +143,11 @@
 
                   <div class="col-12">
                     <label for="image" class="form-label">Фон</label>
-                    <input bind:value={addGameForm.imageUrl} type="text" class="form-control" id="image" placeholder="" >
+                    <input bind:value={addGameForm.image} type="text" class="form-control" id="image" placeholder="" >
                   </div>
 
-                  {#if addGameForm.imageUrl}
-                    <img src="{addGameForm.imageUrl}" style="max-width: 100%;" alt=""/>
+                  {#if addGameForm.image}
+                    <img src="{addGameForm.image}" style="max-width: 100%;" alt=""/>
                   {/if}
 
                   <div class="col-12">
@@ -162,5 +179,10 @@
         flex-direction: column;
         align-items: flex-start;
         justify-content: space-between;
+    }
+
+    .card a{
+      color: #fff;
+      text-decoration: none;
     }
 </style>

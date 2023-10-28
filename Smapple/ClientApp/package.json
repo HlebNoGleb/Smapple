@@ -23,6 +23,6 @@
 	"type": "module",
 	"dependencies": {
 		"bootstrap": "^5.2.3",
-		"sweetalert2": "^11.7.32"
+		"sweetalert2": "^11.8.0"
 	}
 }
