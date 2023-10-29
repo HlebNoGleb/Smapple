@@ -21,6 +21,8 @@ public class Game
 
     public string Image { get; set; }
     
+    public string Address { get; set; }
+    
     public User Host { get; set; }
     
     public List<GameUser> GameUsers { get; set; }

@@ -1,6 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Smapple.DbContext;
+using Smapple.Extensions;
 
 namespace Smapple.Controllers;
 
@@ -14,6 +16,29 @@ public class UserController : Controller
         _db = db;
     }
 
+    [HttpGet]
+    [Route("me")]
+    [Authorize]
+    public async Task<ActionResult> Me()
+    {
+        try
+        {
+            var userId = User.Id();
+
+            var user = await _db.Users
+                .Include(x => x.HostedGames)
+                .Include(x => x.Games)
+                .Include(x => x.GameUsers)
+                .SingleAsync(x => x.Id == userId);
+
+            return Json(user);
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+    
     [HttpGet]
     [Route("{id}")]
     public async Task<ActionResult> GetUser(int id)

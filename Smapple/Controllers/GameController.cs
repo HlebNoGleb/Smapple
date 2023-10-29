@@ -71,14 +71,17 @@ public class GameController : Controller
     {
         try
         {
-            var game = _db.Games.First(x => x.Id == id);
+            var game = _db.Games
+                .Include(x => x.GameUsers)
+                .Include(x => x.Users)
+                .First(x => x.Id == id);
+            
             return Json(game);
         }
         catch (InvalidOperationException e)
         {
             return BadRequest();
         }
-        
     }
 
     [HttpPost]
@@ -117,6 +120,135 @@ public class GameController : Controller
         {
             return BadRequest();
         }
+    }
+    
+    [HttpPost]
+    [Authorize]
+    [Route("{id}/close")]
+    public async Task<ActionResult> CloseGame(int id)
+    {
+        try
+        {
+            var hostId = User.Id();
+
+            await ChangeGameStatus(id, hostId, GameStatusEnum.Closed);
+
+            return Ok();
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("{id}/addPoints")]
+    public async Task<ActionResult> AddPoints([FromBody] int points, int id)
+    {
+        try
+        {
+            var userId = User.Id();
+
+            var gameUserData = await _db.GameUsers
+                .Where(x => x.GameId == id && x.UserId == userId && x.Status == GameUserStatusEnum.Approved)
+                .FirstAsync();
+
+            gameUserData.UserScore = points;
+
+            _db.Update(gameUserData);
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("{gameId}/submitUser/{userId}")]
+    public async Task<ActionResult> SubmitUser(int gameId, int userId)
+    {
+        try
+        {
+            return await ChangeGameUserStatus(gameId, userId, GameUserStatusEnum.Approved);
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("{gameId}/declineUser/{userId}")]
+    public async Task<ActionResult> DeclineUser(int gameId, int userId)
+    {
+        try
+        {
+            return await ChangeGameUserStatus(gameId, userId, GameUserStatusEnum.Declined);
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("{gameId}/createApplication")]
+    public async Task<ActionResult> CreateApplication(int gameId)
+    {
+        try
+        {
+            var userId = User.Id();
+
+            _db.GameUsers.Add(new GameUser()
+            {
+                UserId = userId,
+                GameId = gameId,
+                Status = GameUserStatusEnum.Pending,
+                CreatedDate = DateTime.Now
+            });
+
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+
+    private async Task<ActionResult> ChangeGameUserStatus(int gameId, int userId, GameUserStatusEnum status)
+    {
+        var game = await _db.Games
+            .Include(x => x.GameUsers.Where(x => x.UserId == userId && x.Status == GameUserStatusEnum.Pending))
+            .Where(x => x.Id == gameId)
+            .SingleAsync();
+
+        if (game.HostId != User.Id())
+        {
+            return Forbid();
+        }
+
+        if (!game.GameUsers.Any())
+        {
+            return BadRequest();
+        }
+
+        var gameUser = game.GameUsers.First(x => x.UserId == userId);
+
+        gameUser.Status = status;
+
+        _db.GameUsers.Update(gameUser);
+        await _db.SaveChangesAsync();
+
+        return Ok();
     }
 
     private async Task ChangeGameStatus(int id, int hostId, GameStatusEnum gameStatus)
