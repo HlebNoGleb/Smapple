@@ -1,8 +1,0 @@
-{
-"SpaProxyServer": {
-"ServerUrl": "http://localhost:5173",
-"LaunchCommand": "npm run dev",
-"WorkingDirectory": "D:\\SRC\\SmappleDev\\Smapple\\ClientApp\\",
-"MaxTimeoutInSeconds": "120"
-}
-}

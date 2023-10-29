@@ -5,22 +5,16 @@
 <script>
 // @ts-nocheck
     import { page } from "$app/stores";
-    let promise = getData();
+    export let data;
 
-    async function getData() {
-        return null
-        // const res = await fetch(`https://jsonplaceholder.typicode.com/users/${$page.params.game}`);
+    let gameStatus = [
+      {id: 0, text: "Открытая"},
+      {id: 1, text: "В процессе"},
+      {id: 2, text: "Подсчет очков"},
+      {id: 3, text: "Завершена"}
+    ]
 
-        // if (res.ok) {
-        // 	return res.json();
-        // } else {
-        // 	throw new Error("error");
-        // }`
-    }
-
-    function update() {
-        promise = getData();
-    }
+    let currentStatus = gameStatus.find(x=>x.id == data.game.status)
 
     let editGameForm = {
       title: "",
@@ -40,6 +34,7 @@
 
     function setYandexMaps(node) {
         try {
+            console.log(node)
             ymaps.ready(init);
             const lat = node.getAttribute("data-lat")
             const long = node.getAttribute("data-long")
@@ -90,18 +85,13 @@
         alert(`текущий пользователь из сессии сохранил ${points} очков`)
     }
 </script>
-
-{#await promise}
-    <p>...waiting</p>
-{:then data}
     <main>
         <div class="game" style="background:linear-gradient(0deg, rgba(0,0,0,.7), rgba(0,0,0,.7)), url(https://pbs.twimg.com/media/FQ-TyYnXIAcR0uu.jpg:medium);">
       <div class="container">
 
-            <h1 class="text-body-emphasis">Название игры</h1>
-            <p class="fs-5 col-md-8">Описание игры (если есть - вывести, если нет - добавить)</p>
-            <p class="fs-5 col-md-8">{new Date().toLocaleDateString()} - {new Date().toLocaleTimeString()}</p>
-            <p class="fs-5 col-md-8">Статус игры </p>
+            <h1 class="text-body-emphasis">{data.game.name}</h1>
+            <p class="fs-5 col-md-8">{new Date(data.game.gameDateTime).toLocaleDateString()} - {new Date(data.game.gameDateTime).toLocaleTimeString()}</p>
+            <p class="fs-5 col-md-8">Статус: {currentStatus.text} </p>
             <div class="mb-5">
                 <a class="btn btn-primary btn-lg px-4">Присоединиться (closed game)</a>
                 <a class="btn btn-primary btn-lg px-4">Присоединиться (open game)</a>
@@ -157,9 +147,6 @@
           </div>
         </div>
       </main>
-{:catch error}
-    <p style="color: red">{error.message}</p>
-{/await}
 
 
 <!-- Modal -->
