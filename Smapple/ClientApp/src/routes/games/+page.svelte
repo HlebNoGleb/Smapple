@@ -5,8 +5,10 @@
 
   export let data;
 
-
-  console.log(data)
+  let gameTypes = [
+        { id: 1, text: `Открытая` },
+        { id: 2, text: `Закрытая` },
+  ];
 
   function update() {
     invalidate();
@@ -27,7 +29,6 @@
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}.`);
       if (respomse.code == 401) {
         Swal.fire({
           title: 'Error!',
@@ -36,6 +37,8 @@
           confirmButtonText: 'Cool'
         })
       }
+      throw new Error(`HTTP error! status: ${response.status}.`);
+
     }
 
     update()
@@ -46,7 +49,7 @@
       gameDateTime: null,
       slotsCount: 0,
       address: "",
-      type: "0",
+      type: 0,
       image: ""
   }
 </script>
@@ -71,11 +74,11 @@
                       <div class="card-body">
                         <div class="my-2">
                             <h5 class="card-title">{item.name}</h5>
-                            <a href="/users/{item?.host?.id}" class="card-text">Хост: {item?.host?.username}</a>
+                            <a href="/users/{item?.host?.id}" class="card-text">Хост: {item?.host?.nickName}</a>
                         </div>
                         <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                           <a href="/games/{item.id}" class="btn btn-light">Подробнее</a>
-                          {#if item?.users}
+                          {#if item?.users && item.users.length > 0}
                             <div class="btn-group" role="group">
                               <button type="button" class="btn btn-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                 Игроки {item.users.length} / {item.slotsCount}
@@ -153,8 +156,11 @@
                   <div class="col-12">
                     <label for="country" class="form-label">Тип игры</label>
                     <select bind:value={addGameForm.type}>
-                      <option value="0">Открытая</option>
-                      <option value="1">Закрытая</option>
+                      {#each gameTypes as type}
+                        <option value={type.id}>
+                            {type.text}
+                        </option>
+                        {/each}
                     </select>
                   </div>
 
