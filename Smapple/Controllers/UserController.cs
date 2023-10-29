@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Smapple.DbContext;
 using Smapple.Extensions;
+using Smapple.Models;
 
 namespace Smapple.Controllers;
 
@@ -55,5 +56,18 @@ public class UserController : Controller
         {
             return BadRequest();
         }
+    }
+
+    [HttpGet]
+    public async Task<ActionResult> UsersList()
+    {
+        var  users = _db.Users.Where(x => x.Role != RoleEnum.Admin).ToList();
+
+        foreach (var user in users)
+        {
+            user.Password = string.Empty;
+        }
+
+        return Json(users);
     }
 }
