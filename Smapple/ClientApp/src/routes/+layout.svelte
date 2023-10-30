@@ -37,7 +37,7 @@
                 <ul class="dropdown-menu">
 
                   {#if user}
-                    <li><a class="dropdown-item" href="/users/{user.data.id}">Аккаунт</a></li>
+                    <li><a class="dropdown-item" href="/account">Аккаунт</a></li>
                     <li><a class="dropdown-item" href="#" on:click={logout}>Выйти</a></li>
                   {:else}
                     <li><a class="dropdown-item" href="/signin">Авторизация</a></li>
