@@ -4,22 +4,37 @@
 
 <script lang="ts">
 // @ts-nocheck
+    import Swal from 'sweetalert2'
     import { page } from "$app/stores";
     import { user } from "$lib/user"
 
     export let data;
 
-    console.log(user)
-    console.log(data)
+    // console.log(user?.data)
+    // console.log(data.game)
 
-    let gameStatus = [
-      {id: 0, text: "Открытая"},
-      {id: 1, text: "В процессе"},
-      {id: 2, text: "Подсчет очков"},
-      {id: 3, text: "Завершена"}
-    ];
+    let gameStatus = {
+      Opened: {
+        id: 0,
+        text: "Открытая"
+      },
+      InProgress: {
+        id: 1,
+        text: "В процессе"
+      },
+      CountingResults: {
+        id: 2,
+        text: "Подсчет очков"
+      },
+      Closed: {
+        id: 3,
+        text: "Закрытая"
+      },
+    }
 
-    let currentStatus = gameStatus.find(x=>x.id == data.game.status);
+    let currentStatus = Object.values(gameStatus).find(x=>x.id == data.game.status);
+
+    console.log(currentStatus)
 
     let editGameForm = {
       title: "",
@@ -72,108 +87,202 @@
 
     }
 
-    function startGame() {
-        alert(`игра ${$page.params.game} началась. статус inprogress`)
+    async function startGame() {
+      const response = await fetch(`/api/game/${$page.params.game}/start`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+      });
+
+      if (response.ok) {
+        Swal.fire({
+            title: 'Отлично',
+            text: 'Игра началась',
+            icon: 'success',
+            confirmButtonText: 'Ок'
+          })
+      }
+
+      if (!response.ok) {
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
     }
 
-    function endGame() {
-        alert(`игра ${$page.params.game} завешилась. статус countResult`)
+    async function endGame() {
+      const response = await fetch(`/api/game/${$page.params.game}/counting`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+      });
+
+      if (response.ok) {
+        Swal.fire({
+            title: 'Отлично',
+            text: 'Игра завершилась. Начинайте подсчет очков',
+            icon: 'success',
+            confirmButtonText: 'Ок'
+          })
+      }
+
+      if (!response.ok) {
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
     }
 
-    function saveGame() {
-        alert(`игра ${$page.params.game} завешилась и результаты пользователей сохранены. статус closed`)
+    async function saveGame() {
+      const response = await fetch(`/api/game/${$page.params.game}/close`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+      });
+
+      if (response.ok) {
+        Swal.fire({
+            title: 'Отлично',
+            text: 'Игра завершена. Спасибо за игру',
+            icon: 'success',
+            confirmButtonText: 'Ок'
+          })
+      }
+
+      if (!response.ok) {
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
     }
 
     let points = 0;
 
     async function join() {
       const response = await fetch(`/api/game/${$page.params.game}/createApplication`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${user.data.token}`
-      },
-    });
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+      });
 
-    if (!response.ok) {
-      if (respomse.code == 401) {
+      if (response.ok) {
         Swal.fire({
-          title: 'Error!',
-          text: 'Do you want to continue',
-          icon: 'error',
-          confirmButtonText: 'Cool'
-        })
+            title: 'Отлично',
+            text: 'Вы присоеденились к игре',
+            icon: 'success',
+            confirmButtonText: 'Ок'
+          })
       }
-        throw new Error(`HTTP error! status: ${response.status}.`);
-      }
-    }
 
-    function savePoints() {
-      alert(`текущий пользователь из сессии сохранил ${points} очков`)
+      if (!response.ok) {
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
+  }
+
+    async function savePoints() {
+      const response = await fetch(`/api/game/${$page.params.game}/addPoints`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body:points
+      });
+
+      if (response.ok) {
+        Swal.fire({
+            title: 'Отлично',
+            text: 'Ваши очки сохранены',
+            icon: 'success',
+            confirmButtonText: 'Ок'
+          })
+      }
+
+      if (!response.ok) {
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
     }
 </script>
 
+{#if data}
 <main>
   <div class="game" style="background:linear-gradient(0deg, rgba(0,0,0,.7), rgba(0,0,0,.7)), url({data.game.image});">
 <div class="container">
       <h1 class="text-body-emphasis">{data.game.name}</h1>
       <p class="fs-5 col-md-8">{new Date(data.game.gameDateTime).toLocaleDateString()} - {new Date(data.game.gameDateTime).toLocaleTimeString()}</p>
       <p class="fs-5 col-md-8">Статус: {currentStatus.text}</p>
-      {#if data.game.gameUsers && data?.game?.gameUsers.find(x=>x.id == user.data.id)}
-        <div class="mb-5">
-            <button class="btn btn-primary btn-lg px-4" on:click={join}>Присоединиться</button>
-        </div>
+      {#if user}
+        {#if data.game.gameUsers && !data?.game?.gameUsers.find(x=>x.userId == user.data.id)}
+          <div class="mb-5">
+              <button class="btn btn-primary btn-lg px-4" on:click={join}>Присоединиться</button>
+          </div>
+        {/if}
       {/if}
-      <!-- {#if data.game.hostId == user?.data.id || user?.data.nickName == "admin"}
+      {#if data.game.hostId == user?.data.id || user?.data.nickName == "admin"}
         <div class="my-3">
+          {#if currentStatus.id == gameStatus.Opened.id}
             <button type="button" class="btn btn-primary" on:click={startGame}>
                 Начать игру
             </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+              Изменить игру
+            </button>
+          {/if}
+          {#if currentStatus.id == gameStatus.InProgress.id}
             <button type="button" class="btn btn-primary" on:click={endGame}>
                 Завершить игру
             </button>
+          {/if}
+          {#if currentStatus.id == gameStatus.CountingResults.id}
             <button type="button" class="btn btn-primary" on:click={saveGame}>
                 Сохранить данные игроков и закрыть игру
             </button>
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                Изменить игру
-            </button>
+          {/if}
           </div>
-        {/if} -->
+        {/if}
       <hr class="col-3 col-md-2 mb-5">
       </div>
   </div>
   <div class="container">
 
   <div class="row g-5 my-3">
-    <div class="col-md-6">
-      <h2 class="text-body-emphasis">Список игроков</h2>
-      <ul class="list-unstyled ps-0">
-        {#each [1,2,3,4] as item}
-        <li>
-          <a class="mb-1" href="/users/{item}">
-            Nickname {item}
-          </a>
-        </li>
-        {/each}
-      </ul>
-    </div>
+    {#if data.game.gameUsers && data.game.gameUsers.length > 0}
+      <div class="col-md-6">
+        <h2 class="text-body-emphasis">Список игроков</h2>
+        <ul class="list-unstyled ps-0">
+          {#each data.game.gameUsers as item}
+          <li>
+            <a class="mb-1 text-white" href="/users/{item.userId}">
+              {item.user.nickName}
+            </a>
+          </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
     <div class="col-md-6">
       <!-- <div id="map" style="width: 100%; height: 400px" data-lat="57" data-long="22" data-name="название игры" use:setYandexMaps></div> -->
     </div>
   </div>
   <div class="row g-5 my-3">
+    {#if currentStatus.id == gameStatus.CountingResults.id}
       <div class="col-md-6">
-        <h2 class="text-body-emphasis">Если статус countResult</h2>
         <div class="col-sm-6">
           <label for="points" class="form-label">Внесите ваши очки</label>
-          <input bind:value={points} type="text" class="form-control" id="points" placeholder="" >
+          <input bind:value={points} type="number" class="form-control" id="points" placeholder="" >
         </div>
         <button type="button" class="btn btn-primary" on:click={savePoints}>
           Сохранить
         </button>
       </div>
+      {/if}
     </div>
   </div>
 </main>
@@ -236,6 +345,7 @@
       </div>
     </div>
 </div>
+{/if}
 
 <style>
     .game{
@@ -245,4 +355,6 @@
         color: #fff;
         background-position: center!important;
     }
+
+
 </style>

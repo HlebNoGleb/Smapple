@@ -49,5 +49,6 @@
           </div>
         </div>
       </nav>
-
-      <slot></slot>
+<div>
+  <slot></slot>
+</div>

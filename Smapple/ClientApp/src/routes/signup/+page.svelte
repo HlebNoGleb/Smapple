@@ -31,7 +31,7 @@
             return;
         }
 
-        await fetch(`${config.mainUrl}/api/register`, {
+        const response = await fetch(`${config.mainUrl}/api/register`, {
                 method: 'post',
                 headers: {
                     "Access-Control-Allow-Origin": "*",
@@ -42,21 +42,19 @@
                 },
                 body: JSON.stringify(signUp)
             })
-            .then(function (response) {
-                return response.json();
+        if (response.ok) {
+            Swal.fire({
+                title: 'Отлично',
+                text: 'Ваш аккаунт создан',
+                icon: 'success',
+                confirmButtonText: 'Войти'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    goto("/signin")
+                }
             })
-            .then(function (result) {
-                console.log(result);
-            })
-            .catch(function (error) {
-                console.log('Request failed', error);
-                Swal.fire({
-                    title: 'Oups...',
-                    text: 'Something went wrong',
-                    icon: 'error',
-                    confirmButtonText: 'ok'
-                })
-            });
+
+        }
     }
 </script>
 
