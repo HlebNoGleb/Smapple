@@ -41,6 +41,10 @@ public class GameController : Controller
 
         foreach (var game in games)
         {
+            foreach (var user in game.Users)
+            {
+                user.Password = string.Empty;
+            }
             game.Host.Password = string.Empty;
         }
 
@@ -73,8 +77,14 @@ public class GameController : Controller
         {
             var game = _db.Games
                 .Include(x => x.GameUsers)
-                .Include(x => x.Users)
+                .Include(x => x.Host)
                 .First(x => x.Id == id);
+
+            game.Host.Password = string.Empty;
+            foreach (var gameUser in game.GameUsers)
+            {
+                gameUser.User.Password = string.Empty;
+            }
             
             return Json(game);
         }
@@ -206,14 +216,53 @@ public class GameController : Controller
         {
             var userId = User.Id();
 
+            var game = await _db.Games.SingleAsync(x => x.Id == gameId);
+            
             _db.GameUsers.Add(new GameUser()
             {
                 UserId = userId,
                 GameId = gameId,
-                Status = GameUserStatusEnum.Pending,
+                Status = game.Type == GameTypeEnum.Private 
+                    ? GameUserStatusEnum.Pending
+                    : GameUserStatusEnum.Approved,
                 CreatedDate = DateTime.Now
             });
 
+            await _db.SaveChangesAsync();
+
+            return Ok();
+        }
+        catch (InvalidOperationException e)
+        {
+            return BadRequest();
+        }
+    }
+
+    [HttpPost]
+    [Authorize]
+    [Route("{gameId}/removeUser/{userId}")]
+    public async Task<ActionResult> RemoveUserFromGame(int gameId, int userId)
+    {
+        try
+        {
+            var game = await _db.Games
+                .Include(x => x.GameUsers.Where(x => x.UserId == userId && x.Status == GameUserStatusEnum.Pending))
+                .Where(x => x.Id == gameId)
+                .SingleAsync();
+
+            if (game.HostId != User.Id())
+            {
+                return Forbid();
+            }
+
+            if (!game.GameUsers.Any())
+            {
+                return BadRequest();
+            }
+
+            var gameUser = game.GameUsers.First(x => x.UserId == userId);
+
+            _db.GameUsers.Remove(gameUser);
             await _db.SaveChangesAsync();
 
             return Ok();
