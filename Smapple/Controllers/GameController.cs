@@ -77,6 +77,7 @@ public class GameController : Controller
         {
             var game = _db.Games
                 .Include(x => x.GameUsers)
+                .ThenInclude(x => x.User)
                 .Include(x => x.Host)
                 .First(x => x.Id == id);
 

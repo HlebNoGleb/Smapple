@@ -1,3 +1,3 @@
 export const config = {
-    mainUrl: "http://localhost:5125",
+    mainUrl: "http://localhost:5173",
 }

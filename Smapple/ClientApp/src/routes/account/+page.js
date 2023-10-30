@@ -1,7 +1,21 @@
+
 export async function load({params}) {
-    const res = await fetch(`http://localhost:5173/api/user/${params.user}`);
-    let user = await res.json();
-    console.log(user);
-    
-	return {user:user}
+    if (typeof window !== "undefined") {
+
+        const token = localStorage.getItem('token');
+
+        const res = await fetch(`/api/user/me`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+        })
+            .then(function (response) {
+                return response.json();
+            });
+
+        console.log(res);
+
+        return {user: res}
+    }
 }

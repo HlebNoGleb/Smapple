@@ -28,10 +28,19 @@ public class UserController : Controller
 
             var user = await _db.Users
                 .Include(x => x.HostedGames)
+                .ThenInclude(x => x.Users)
                 .Include(x => x.Games)
                 .Include(x => x.GameUsers)
                 .SingleAsync(x => x.Id == userId);
 
+            foreach (var hostedGame in user.HostedGames)
+            {
+                foreach (var hostedGameUser in hostedGame.Users)
+                {
+                    hostedGameUser.Password = string.Empty;
+                }
+            }
+            
             return Json(user);
         }
         catch (InvalidOperationException e)

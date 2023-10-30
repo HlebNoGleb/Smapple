@@ -45,7 +45,7 @@ public class AuthController : Controller
 
     [HttpPost]
     [Route("api/register")]
-    public async Task<ActionResult> Register(User user)
+    public async Task<ActionResult> Register([FromBody] User user)
     {
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();
