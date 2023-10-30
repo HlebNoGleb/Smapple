@@ -25,6 +25,10 @@
                 <div class="col-auto nav-item">
                   <a class="nav-link" href="/games">Games</a>
                 </div>
+
+                <div class="col-auto nav-item">
+                  <a class="nav-link" href="/users">Users</a>
+                </div>
               </div>
               <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

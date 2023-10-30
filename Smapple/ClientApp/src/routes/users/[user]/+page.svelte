@@ -1,22 +1,14 @@
 <script>
 // @ts-nocheck
     import { page } from "$app/stores";
-    let promise = getData();
+import { invalidate } from '$app/navigation';
+    export let data;
 
     console.log($page)
 
-    async function getData() {
-        const res = await fetch(`https://jsonplaceholder.typicode.com/users/${$page.params.user}`);
-
-        if (res.ok) {
-        	return res.json();
-        } else {
-        	throw new Error("error");
-        }
-    }
-
+    
     function update() {
-        promise = getData();
+      invalidate();
     }
 
     function submit() {
@@ -54,16 +46,16 @@
     }
 </script>
 
-{#await promise}
-    <p>...waiting</p>
-{:then data}
+<!--{#await promise}-->
+<!--    <p>...waiting</p>-->
+<!--{:then data}-->
     <main>
         <div class="game">
       <div class="container">
 
-            <h1 class="text-body-emphasis">{data.name}</h1>
+            <h1 class="text-body-emphasis">{data.user.nickName}</h1>
             <h1 class="text-body-emphasis">Очки: 100</h1>
-            <p class="fs-5 col-md-8">{data.email}</p>
+            <p class="fs-5 col-md-8">{data.user.email}</p>
             <hr class="col-3 col-md-2 mb-5">
             <div class="my-3">
                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
@@ -81,7 +73,7 @@
               {#each [1,2,3,4] as game}
               <li>
                 <a class="mb-1" href="/games/{game}">
-                  Game {game}
+                  Game {game.title}
                 </a>
               </li>
               {/each}
@@ -153,9 +145,9 @@
         </div>
         </div>
       </main>
-{:catch error}
-    <p style="color: red">{error.message}</p>
-{/await}
+<!--{:catch error}-->
+<!--    <p style="color: red">{error.message}</p>-->
+<!--{/await}-->
 
 
 <!-- Modal -->

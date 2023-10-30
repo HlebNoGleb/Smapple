@@ -33,7 +33,7 @@
     });
 
     if (!response.ok) {
-      if (respomse.code == 401) {
+      if (response.code == 401) {
         Swal.fire({
           title: 'Error!',
           text: 'Do you want to continue',

@@ -92,7 +92,7 @@
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIyIiwicm9sZSI6Ikhvc3QiLCJuYmYiOjE2OTg1Mzk3MjgsImV4cCI6MTY5OTE0NDUyOCwiaWF0IjoxNjk4NTM5NzI4fQ.TwI1EvEuPrOJNfqmrZfDdGywoePnLWIpizUNupxdVlod76yIlsw2ud8qE78M8Mf6F-KGhqj2n5ViEFY2QRqHzQ`
+        'Authorization': `Bearer ${user.data.token}`
       },
     });
 

@@ -52,7 +52,7 @@ app.UseStaticFiles();
 
 app.UseAuthorization();
 app.UseCors(
-    options => options.WithOrigins("http://localhost:5173").AllowAnyMethod()
+    options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
 );
 
 app.MapFallbackToFile("index.html");
