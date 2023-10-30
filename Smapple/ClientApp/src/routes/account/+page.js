@@ -14,8 +14,6 @@ export async function load({params}) {
                 return response.json();
             });
 
-        console.log(res);
-
-        return {user: res}
+        return {me: res}
     }
 }

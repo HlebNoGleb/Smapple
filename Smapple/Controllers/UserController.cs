@@ -28,16 +28,16 @@ public class UserController : Controller
 
             var user = await _db.Users
                 .Include(x => x.HostedGames)
-                .ThenInclude(x => x.Users)
+                .ThenInclude(x => x.GameUsers)
+                .ThenInclude(x => x.User)
                 .Include(x => x.Games)
-                .Include(x => x.GameUsers)
                 .SingleAsync(x => x.Id == userId);
 
             foreach (var hostedGame in user.HostedGames)
             {
-                foreach (var hostedGameUser in hostedGame.Users)
+                foreach (var hostedGameUser in hostedGame.GameUsers)
                 {
-                    hostedGameUser.Password = string.Empty;
+                    hostedGameUser.User.Password = string.Empty;
                 }
             }
             
