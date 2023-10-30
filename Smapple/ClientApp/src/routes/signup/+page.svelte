@@ -4,19 +4,17 @@
     import { config } from '$lib/config';
 
     let signUp = {
-        email: "",
-        password: "",
-        nickname: ""
+        email: "test@test.test",
+        password: "1234",
+        nickname: "111111"
     }
 
     async function auth() {
 
-        // add jwt logic
-
         let validation = true;
 
         Object.values(signUp).forEach(item => {
-            if (!item){
+            if (!item) {
                 Swal.fire({
                     title: 'Oups...',
                     text: 'All fields must be filled in',
@@ -33,39 +31,32 @@
             return;
         }
 
-        await fetch(`${config.mainUrl}/signup`, {
-            method: 'post',
-            headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(signUp)
-        })
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (result) {
-            console.log('Request failed', result);
-            Swal.fire({
-                title: 'Success',
-                text: 'Сonfirm your account by email',
-                icon: 'success',
-                confirmButtonText: 'ok',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    goto('/calendar');
-                }
+        await fetch(`${config.mainUrl}/api/register`, {
+                method: 'post',
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+                    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+                    "Access-Control-Allow-Credentials": "true",
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(signUp)
             })
-        })
-        .catch (function (error) {
-            console.log('Request failed', error);
-            Swal.fire({
-                title: 'Oups...',
-                text: 'Something went wrong',
-                icon: 'error',
-                confirmButtonText: 'ok'
+            .then(function (response) {
+                return response.json();
             })
-        });
+            .then(function (result) {
+                console.log(result);
+            })
+            .catch(function (error) {
+                console.log('Request failed', error);
+                Swal.fire({
+                    title: 'Oups...',
+                    text: 'Something went wrong',
+                    icon: 'error',
+                    confirmButtonText: 'ok'
+                })
+            });
     }
 </script>
 
@@ -75,15 +66,15 @@
             <form on:submit|preventDefault={auth}>
                 <div class="form-floating">
                     <input bind:value={signUp.nickname} type="text" class="form-control" id="login" placeholder="">
-                    <label for="login">Login</label>
+                    <label for="login">Ник</label>
                 </div>
                 <div class="form-floating">
                     <input bind:value={signUp.email} type="email" class="form-control" id="email" placeholder="name@example.com">
-                    <label for="email">Email address</label>
+                    <label for="email">Email</label>
                 </div>
                 <div class="form-floating">
                     <input bind:value={signUp.password} type="password" class="form-control" id="password" placeholder="Password">
-                    <label for="password">Password</label>
+                    <label for="password">Пароль</label>
                 </div>
                 <button class="w-100 btn btn-lg btn-primary" type="submit">Sign Up</button>
             </form>

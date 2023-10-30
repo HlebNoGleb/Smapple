@@ -1,16 +1,15 @@
 <script>
     import Swal from 'sweetalert2'
     import { config } from '$lib/config';
+    import { goto } from "$app/navigation";
+
 
     let signIn = {
-        email: "",
-        password: "",
-        remember: false,
+        email: "test@test.test",
+        password: "1234",
     }
 
     async function auth() {
-
-        // add jwt logic
 
         let validation = true;
 
@@ -32,11 +31,14 @@
             return;
         }
 
-        await fetch(`${config.mainUrl}/signin`, {
+        await fetch(`${config.mainUrl}/api/login`, {
             method: 'post',
             headers: {
-                'Accept': 'application/json, text/plain, */*',
-                'Content-Type': 'application/json'
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "Authorization, Origin, X-Requested-With, Content-Type, Accept",
+                "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
+                "Access-Control-Allow-Credentials": "true",
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(signIn)
         })
@@ -44,7 +46,11 @@
             return response.json();
         })
         .then(function (result) {
-
+            if (result.user && result.token) {
+                localStorage.setItem('user', JSON.stringify(result.user))
+                localStorage.setItem('token', result.token)
+                location.href = '/games'
+            }
         })
         .catch (function (error) {
             console.log('Request failed', error);
@@ -68,12 +74,6 @@
             <div class="form-floating">
                 <input type="password" bind:value={signIn.password} class="form-control" id="floatingPassword" placeholder="Password">
                 <label for="floatingPassword">Password</label>
-            </div>
-
-            <div class="checkbox mb-3">
-                <label>
-                <input type="checkbox" bind:value={signIn.remember}> Remember me
-                </label>
             </div>
             <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
         </form>

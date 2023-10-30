@@ -2,12 +2,13 @@
 // @ts-nocheck
 
     import { page } from "$app/stores";
-    let user = {
-      name: "User 1",
-      id: 1,
-    }
+    import { user } from "$lib/user"
 
-    // user = null
+    function logout(){
+      localStorage.removeItem("user")
+      localStorage.removeItem("token")
+      location.reload()
+    }
 
 </script>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark px-lg-5 px-2 py-3" aria-label="Third navbar example">
@@ -27,13 +28,13 @@
               </div>
               <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  {#if user} {user.name} {:else} Аккаунт {/if}
+                  {#if user} {user.data.nickName} {:else} Аккаунт {/if}
                 </a>
                 <ul class="dropdown-menu">
 
                   {#if user}
-                    <li><a class="dropdown-item" href="/users/{user.id}">Аккаунт</a></li>
-                    <li><a class="dropdown-item" href="#">Выйти</a></li>
+                    <li><a class="dropdown-item" href="/users/{user.data.id}">Аккаунт</a></li>
+                    <li><a class="dropdown-item" href="#" on:click={logout}>Выйти</a></li>
                   {:else}
                     <li><a class="dropdown-item" href="/signin">Авторизация</a></li>
                     <li><a class="dropdown-item" href="/signup">Регистрация</a></li>

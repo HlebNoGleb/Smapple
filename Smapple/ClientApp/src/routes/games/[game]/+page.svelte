@@ -1,20 +1,25 @@
 <svelte:head>
-    <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <!-- <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script> -->
 </svelte:head>
 
-<script>
+<script lang="ts">
 // @ts-nocheck
     import { page } from "$app/stores";
+    import { user } from "$lib/user"
+
     export let data;
+
+    console.log(user)
+    console.log(data)
 
     let gameStatus = [
       {id: 0, text: "Открытая"},
       {id: 1, text: "В процессе"},
       {id: 2, text: "Подсчет очков"},
       {id: 3, text: "Завершена"}
-    ]
+    ];
 
-    let currentStatus = gameStatus.find(x=>x.id == data.game.status)
+    let currentStatus = gameStatus.find(x=>x.id == data.game.status);
 
     let editGameForm = {
       title: "",
@@ -23,7 +28,7 @@
       address: "",
       type: "0",
       imageUrl: ""
-  }
+    }
 
   function submit() {
     alert(JSON.stringify(editGameForm));
@@ -81,73 +86,97 @@
 
     let points = 0;
 
+    async function join() {
+      const response = await fetch(`/api/game/${$page.params.game}/createApplication`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIyIiwicm9sZSI6Ikhvc3QiLCJuYmYiOjE2OTg1Mzk3MjgsImV4cCI6MTY5OTE0NDUyOCwiaWF0IjoxNjk4NTM5NzI4fQ.TwI1EvEuPrOJNfqmrZfDdGywoePnLWIpizUNupxdVlod76yIlsw2ud8qE78M8Mf6F-KGhqj2n5ViEFY2QRqHzQ`
+      },
+    });
+
+    if (!response.ok) {
+      if (respomse.code == 401) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Do you want to continue',
+          icon: 'error',
+          confirmButtonText: 'Cool'
+        })
+      }
+        throw new Error(`HTTP error! status: ${response.status}.`);
+      }
+    }
+
     function savePoints() {
-        alert(`текущий пользователь из сессии сохранил ${points} очков`)
+      alert(`текущий пользователь из сессии сохранил ${points} очков`)
     }
 </script>
-    <main>
-        <div class="game" style="background:linear-gradient(0deg, rgba(0,0,0,.7), rgba(0,0,0,.7)), url(https://pbs.twimg.com/media/FQ-TyYnXIAcR0uu.jpg:medium);">
-      <div class="container">
 
-            <h1 class="text-body-emphasis">{data.game.name}</h1>
-            <p class="fs-5 col-md-8">{new Date(data.game.gameDateTime).toLocaleDateString()} - {new Date(data.game.gameDateTime).toLocaleTimeString()}</p>
-            <p class="fs-5 col-md-8">Статус: {currentStatus.text} </p>
-            <div class="mb-5">
-                <a class="btn btn-primary btn-lg px-4">Присоединиться (closed game)</a>
-                <a class="btn btn-primary btn-lg px-4">Присоединиться (open game)</a>
-            </div>
-            <p>Если пользоавтель хост или админ</p>
-            <div class="my-3">
-                <button type="button" class="btn btn-primary" on:click={startGame}>
-                    Начать игру
-                </button>
-                <button type="button" class="btn btn-primary" on:click={endGame}>
-                    Завершить игру
-                </button>
-                <button type="button" class="btn btn-primary" on:click={saveGame}>
-                    Сохранить данные игроков и закрыть игру
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                    Изменить игру
-                </button>
-              </div>
-            <hr class="col-3 col-md-2 mb-5">
-            </div>
+<main>
+  <div class="game" style="background:linear-gradient(0deg, rgba(0,0,0,.7), rgba(0,0,0,.7)), url({data.game.image});">
+<div class="container">
+      <h1 class="text-body-emphasis">{data.game.name}</h1>
+      <p class="fs-5 col-md-8">{new Date(data.game.gameDateTime).toLocaleDateString()} - {new Date(data.game.gameDateTime).toLocaleTimeString()}</p>
+      <p class="fs-5 col-md-8">Статус: {currentStatus.text}</p>
+      {#if data.game.gameUsers && data?.game?.gameUsers.find(x=>x.id == user.data.id)}
+        <div class="mb-5">
+            <button class="btn btn-primary btn-lg px-4" on:click={join}>Присоединиться</button>
         </div>
-        <div class="container">
+      {/if}
+      <!-- {#if data.game.hostId == user?.data.id || user?.data.nickName == "admin"}
+        <div class="my-3">
+            <button type="button" class="btn btn-primary" on:click={startGame}>
+                Начать игру
+            </button>
+            <button type="button" class="btn btn-primary" on:click={endGame}>
+                Завершить игру
+            </button>
+            <button type="button" class="btn btn-primary" on:click={saveGame}>
+                Сохранить данные игроков и закрыть игру
+            </button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Изменить игру
+            </button>
+          </div>
+        {/if} -->
+      <hr class="col-3 col-md-2 mb-5">
+      </div>
+  </div>
+  <div class="container">
 
-        <div class="row g-5 my-3">
-          <div class="col-md-6">
-            <h2 class="text-body-emphasis">Список игроков</h2>
-            <ul class="list-unstyled ps-0">
-              {#each [1,2,3,4] as item}
-              <li>
-                <a class="mb-1" href="/users/{item}">
-                  Nickname {item}
-                </a>
-              </li>
-              {/each}
-            </ul>
-          </div>
-          <div class="col-md-6">
-            <div id="map" style="width: 100%; height: 400px" data-lat="57" data-long="22" data-name="название игры" use:setYandexMaps></div>
-          </div>
+  <div class="row g-5 my-3">
+    <div class="col-md-6">
+      <h2 class="text-body-emphasis">Список игроков</h2>
+      <ul class="list-unstyled ps-0">
+        {#each [1,2,3,4] as item}
+        <li>
+          <a class="mb-1" href="/users/{item}">
+            Nickname {item}
+          </a>
+        </li>
+        {/each}
+      </ul>
+    </div>
+    <div class="col-md-6">
+      <!-- <div id="map" style="width: 100%; height: 400px" data-lat="57" data-long="22" data-name="название игры" use:setYandexMaps></div> -->
+    </div>
+  </div>
+  <div class="row g-5 my-3">
+      <div class="col-md-6">
+        <h2 class="text-body-emphasis">Если статус countResult</h2>
+        <div class="col-sm-6">
+          <label for="points" class="form-label">Внесите ваши очки</label>
+          <input bind:value={points} type="text" class="form-control" id="points" placeholder="" >
         </div>
-        <div class="row g-5 my-3">
-            <div class="col-md-6">
-              <h2 class="text-body-emphasis">Если статус countResult</h2>
-              <div class="col-sm-6">
-                <label for="points" class="form-label">Внесите ваши очки</label>
-                <input bind:value={points} type="text" class="form-control" id="points" placeholder="" >
-              </div>
-              <button type="button" class="btn btn-primary" on:click={savePoints}>
-                Сохранить
-              </button>
-            </div>
-          </div>
-        </div>
-      </main>
-
+        <button type="button" class="btn btn-primary" on:click={savePoints}>
+          Сохранить
+        </button>
+      </div>
+    </div>
+  </div>
+</main>
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -214,5 +243,6 @@
         background-size: cover!important;
         padding: 20px;
         color: #fff;
+        background-position: center!important;
     }
 </style>
