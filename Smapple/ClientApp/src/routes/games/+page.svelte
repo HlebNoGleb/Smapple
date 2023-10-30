@@ -2,28 +2,32 @@
 // @ts-nocheck
   import { invalidate } from '$app/navigation';
   import Swal from 'sweetalert2'
+  import { user } from "$lib/user"
 
   export let data;
 
   let gameTypes = [
-        { id: 1, text: `Открытая` },
-        { id: 2, text: `Закрытая` },
+    { id: 1, text: `Открытая` },
+    { id: 2, text: `Закрытая` },
   ];
+
+  let roles = [
+    {id: 0, text: "Хост"},
+    {id: 1, text: "Игрок"},
+    {id: 2, text: "Админ"}
+  ]
 
   function update() {
     invalidate();
   }
 
   async function submit() {
-    alert(JSON.stringify(addGameForm));
-    // send to server
-    // if 200ok
-    const rawResponse = await fetch('/api/game', {
+    const response = await fetch('/api/game', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJuYW1laWQiOiIxIiwicm9sZSI6IkFkbWluIiwibmJmIjoxNjk4NTM0Mjc3LCJleHAiOjE2OTkxMzkwNzcsImlhdCI6MTY5ODUzNDI3N30.6Xw2iJbnPR8_GDd9TQMjoMGT2g7NyREKaSA_RlMiMhhTB2P87lKEftGAa3dGJQQY3-IAHvEqKSscokzX1k-BdQ`
+        'Authorization': `Bearer ${user.data.role}`
       },
       body: JSON.stringify(addGameForm)
     });
@@ -56,20 +60,18 @@
 
 <div class="px-lg-5 px-2">
 <div class="container-fluid p-lg-4 p-3 rounded substrate">
-  <!-- {#await promise}
-    <p>...waiting</p>
-  {:then data} -->
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h2>Игры Smapple</h2>
-      <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#addGame">
-        Добавить игру
-      </button>
+      {#if user?.data.role == roles[0].id}
+        <button type="button" class="btn btn-primary " data-bs-toggle="modal" data-bs-target="#addGame">
+          Добавить игру
+        </button>
+      {/if}
     </div>
     <div class="row row-cols-1 row-cols-xxl-5 row-cols-xl-4 row-cols-md-3 row-cols-sm-2 g-3">
         {#each data.games as item}
             <div class="col">
                 <div class="card">
-
                       <img src="{item.image}" class="card-img-bottom" alt="{item.id} - {item.name}">
                       <div class="card-body">
                         <div class="my-2">
@@ -84,8 +86,8 @@
                                 Игроки {item.users.length} / {item.slotsCount}
                               </button>
                                 <ul class="dropdown-menu">
-                                  {#each item?.users as user}
-                                    <li><a class="dropdown-item" href="/users/{user.id}">{user.nickname}</a></li>
+                                  {#each item?.gameUsers as gameUser}
+                                    <li><a class="dropdown-item" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a></li>
                                   {/each}
                                 </ul>
                             </div>
@@ -102,11 +104,11 @@
             </div>
         {/each}
     </div>
-    <div class="my-3">
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addGame">
+    {#if user?.data.role == roles[0].id}
+      <button type="button" class="btn btn-primary my-3" data-bs-toggle="modal" data-bs-target="#addGame">
         Добавить игру
       </button>
-    </div>
+    {/if}
 <!-- {:catch error}
     <p style="color: red">{error.message}</p>
 {/await} -->

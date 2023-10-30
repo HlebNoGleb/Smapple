@@ -1,3 +1,3 @@
 export const config = {
-    mainUrl: "https://google.com",
+    mainUrl: "http://localhost:5125",
 }
