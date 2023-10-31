@@ -1,12 +1,29 @@
 <script>
 // @ts-nocheck
     import { page } from "$app/stores";
-import { invalidate } from '$app/navigation';
+    import { invalidate } from '$app/navigation';
+    import { user } from "$lib/user"
+
     export let data;
 
-    console.log($page)
+    let gameUserStatus = {
+      Pending: {
+        id: 0,
+        text: "Запрос"
+      },
+      Approved: {
+        id: 1,
+        text: "Подтвержден"
+      },
+      Declined: {
+        id: 2,
+        text: "Запрещен"
+      },
+    }
 
-    
+    console.log(data)
+
+
     function update() {
       invalidate();
     }
@@ -50,47 +67,49 @@ import { invalidate } from '$app/navigation';
 <!--    <p>...waiting</p>-->
 <!--{:then data}-->
     <main>
-        <div class="game">
-      <div class="container">
-
-            <h1 class="text-body-emphasis">{data.user.nickName}</h1>
-            <h1 class="text-body-emphasis">Очки: 100</h1>
-            <p class="fs-5 col-md-8">{data.user.email}</p>
-            <hr class="col-3 col-md-2 mb-5">
-            <div class="my-3">
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-                  Изменить данные
-                </button>
-              </div>
-            </div>
-        </div>
+      <div class="user">
         <div class="container">
+          <h1 class="text-body-emphasis">{data.user.nickName}</h1>
+          <h1 class="text-body-emphasis">Очки: 100</h1>
+          <p class="fs-5 col-md-8">{data.user.email}</p>
+          <hr class="col-3 col-md-2 mb-5">
+          {#if data.user.id == user?.data?.id}
+            <div class="my-3">
+              <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                Изменить данные
+              </button>
+            </div>
+          {/if}
+        </div>
+      </div>
+      <div class="container">
 
         <div class="row g-5 my-3">
           <div class="col-md-6">
             <h2 class="text-body-emphasis">Список игр в которых он учавствовал</h2>
             <ul class="list-unstyled ps-0">
-              {#each [1,2,3,4] as game}
-              <li>
-                <a class="mb-1" href="/games/{game}">
-                  Game {game.title}
-                </a>
-              </li>
+              {#each data.user?.gameUsers as gameUser}
+                {#if gameUser.status == gameUserStatus.Approved.id}
+                <li>
+                  <a class="mb-1" href="/games/{gameUser.game.id}">
+                    {gameUser.game.name}
+                  </a>
+                </li>
+                {/if}
               {/each}
             </ul>
           </div>
           <div class="col-md-6">
             <h2 class="text-body-emphasis">Список игр в которые он подал заявки</h2>
             <ul class="list-unstyled ps-0">
-              {#each [1,2,3,4] as game}
-              <li>
-                <a class="mb-1" href="/games/{game}">
-                  Game {game}
-                </a>
-                <button type="button" class="btn btn-danger" on:click={() => {removeFromGameApplication(game, $page.params.user)}}>
-                  Удалить заявку
-                </button>
-              </li>
+              {#each data.user?.gameUsers as gameUser}
+                {#if gameUser.status == gameUserStatus.Pending.id}
+                <li>
+                  <a class="mb-1" href="/games/{gameUser.game.id}">
+                    {gameUser.game.name}
+                  </a>
+                </li>
+                {/if}
               {/each}
             </ul>
           </div>
@@ -98,12 +117,13 @@ import { invalidate } from '$app/navigation';
         <h1>Если пользователь хост</h1>
         <div class="row g-5 my-3">
           <div class="col-md-12">
+            {#if data.user.hostedGames}
             <h2 class="text-body-emphasis">Список игр в которых он хост</h2>
             <ul class="list-unstyled ps-0">
-              {#each [1,2,3,4] as game}
+              {#each data.user?.hostedGames as game}
               <li>
-                <a class="mb-1" href="/games/{game}">
-                  hosted game {game}
+                <a class="mb-1" href="/games/{game.id}">
+                  {game.name}
                 </a>
                 <ul class="list-unstyled ps-0">
                   {#each [1,2,3,4] as user}
@@ -122,6 +142,7 @@ import { invalidate } from '$app/navigation';
               <hr>
               {/each}
             </ul>
+            {/if}
           </div>
         </div>
         <h1>Если пользователь админ</h1>
@@ -153,7 +174,7 @@ import { invalidate } from '$app/navigation';
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div class="modal-content substrate">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -188,10 +209,13 @@ import { invalidate } from '$app/navigation';
   </div>
 
 <style>
-    .game{
+    .user{
         position: relative;
         background-size: cover!important;
         padding: 20px;
-        color: #000;
+        color: #fff;
+    }
+    a{
+      color:#fff
     }
 </style>

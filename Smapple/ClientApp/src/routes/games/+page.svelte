@@ -7,8 +7,8 @@
   export let data;
 
   let gameTypes = [
-    { id: 1, text: `Открытая` },
-    { id: 2, text: `Закрытая` },
+    { id: 0, text: `Открытая` },
+    { id: 1, text: `Закрытая` },
   ];
 
   let roles = [
@@ -16,6 +16,21 @@
     {id: 1, text: "Игрок"},
     {id: 2, text: "Админ"}
   ]
+
+  let gameUserStatus = {
+      Pending: {
+        id: 0,
+        text: "Запрос"
+      },
+      Approved: {
+        id: 1,
+        text: "Подтвержден"
+      },
+      Declined: {
+        id: 2,
+        text: "Запрещен"
+      },
+    }
 
   function update() {
     invalidate();
@@ -77,6 +92,7 @@
                         <div class="my-2">
                             <h5 class="card-title">{item.name}</h5>
                             <a href="/users/{item?.host?.id}" class="card-text">Хост: {item?.host?.nickName}</a>
+                            <p>{item.address}</p>
                         </div>
                         <div class="btn-group" role="group" aria-label="Button group with nested dropdown">
                           <a href="/games/{item.id}" class="btn btn-light">Подробнее</a>
@@ -87,7 +103,9 @@
                               </button>
                                 <ul class="dropdown-menu">
                                   {#each item?.gameUsers as gameUser}
-                                    <li><a class="dropdown-item" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a></li>
+                                    {#if gameUser.status == gameUserStatus.Approved.id}
+                                      <li><a class="dropdown-item" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a></li>
+                                    {/if}
                                   {/each}
                                 </ul>
                             </div>
@@ -95,10 +113,7 @@
                         </div>
                       </div>
                       <div class="card-footer text-muted">
-                        Дата игры: {new Date(item.gameDateTime).toLocaleDateString()} {new Date(item.gameDateTime).toLocaleTimeString()}
-                      </div>
-                      <div class="card-footer text-muted">
-                        {item.address}
+                        <p>Дата игры: {new Date(item.gameDateTime).toLocaleDateString()} {new Date(item.gameDateTime).toLocaleTimeString()}</p>
                       </div>
                 </div>
             </div>

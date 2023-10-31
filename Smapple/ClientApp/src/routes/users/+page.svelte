@@ -2,32 +2,26 @@
   import {invalidate} from "$app/navigation";
 
   export let data;
-  
+
   function update() {
       invalidate();
   }
 </script>
 
-<div class="container">
-<div class="my-3">
-  <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Пользователи
-  </button>
-</div>
-    <div class="row row-cols-sm-2 row-cols-md-3 g-4 my-3">
+<div class="px-lg-5 px-2">
+    <div class="container-fluid p-lg-4 p-3 rounded substrate">
+    <div class="row row-cols-sm-3 row-cols-xs-1 row-cols-md-4 row-cols-lg-5 g-4 my-3">
         {#each data.users as item}
             <div class="col">
                 <div class="card">
                     <div class="card-header">
-                        Имя
+                        {item.nickName}
                       </div>
-                      <img src="{item.nickName}" class="card-img-bottom" alt="{item.id} - {item.nickName}">
                       <div class="card-body">
                         <div class="my-2">
                             <h5 class="card-title">{item.email}</h5>
-                            <p class="card-text">Email</p>
                         </div>
-                        <a href="/user/{item.id}" class="btn btn-primary">Подробнее</a>
+                        <a href="/users/{item.id}" class="btn btn-light">Подробнее</a>
                       </div>
                 </div>
             </div>
@@ -38,6 +32,7 @@
 <!--        Добавить игру-->
 <!--      </button>-->
 <!--    </div>-->
+</div>
 </div>
 
 <!--&lt;!&ndash; Modal &ndash;&gt;-->
