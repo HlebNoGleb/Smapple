@@ -55,7 +55,10 @@ public class UserController : Controller
     {
         try
         {
-            var user = await _db.Users.Include(x => x.Games).SingleAsync(x => x.Id == id);
+            var user = await _db.Users
+                .Include(x => x.Games)
+                .Include(x => x.HostedGames)
+                .SingleAsync(x => x.Id == id);
 
             user.Password = string.Empty;
 

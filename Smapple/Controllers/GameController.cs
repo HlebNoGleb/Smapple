@@ -251,7 +251,7 @@ public class GameController : Controller
                 .Where(x => x.Id == gameId)
                 .SingleAsync();
 
-            if (game.HostId != User.Id())
+            if (game.HostId != User.Id() && User.Id() != userId)
             {
                 return Forbid();
             }
