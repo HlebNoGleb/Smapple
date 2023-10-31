@@ -27,7 +27,7 @@
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${user.data.role}`
+        'Authorization': `Bearer ${user.token}`
       },
       body: JSON.stringify(addGameForm)
     });

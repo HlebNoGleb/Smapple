@@ -47,6 +47,13 @@ public class AuthController : Controller
     [Route("api/register")]
     public async Task<ActionResult> Register([FromBody] User user)
     {
+        var existingUser = await _dbContext.Users.SingleOrDefaultAsync(x => x.Email == user.Email);
+
+        if (existingUser != null)
+        {
+            return BadRequest();
+        }
+        
         user.Role = RoleEnum.Simple;
         
         _dbContext.Users.Add(user);
