@@ -10,6 +10,9 @@
 
     export let data;
 
+
+    console.log(data)
+
     // console.log(user?.data)
     // console.log(data.game)
 
@@ -29,6 +32,21 @@
       Closed: {
         id: 3,
         text: "Закрытая"
+      },
+    }
+
+    let gameUserStatus = {
+      Pending: {
+        id: 0,
+        text: "Запрос"
+      },
+      Approved: {
+        id: 1,
+        text: "Подтвержден"
+      },
+      Declined: {
+        id: 2,
+        text: "Запрещен"
       },
     }
 
@@ -218,8 +236,12 @@
       <h1 class="text-body-emphasis">{data.game.name}</h1>
       <p class="fs-5 col-md-8">{new Date(data.game.gameDateTime).toLocaleDateString()} - {new Date(data.game.gameDateTime).toLocaleTimeString()}</p>
       <p class="fs-5 col-md-8">Статус: {currentStatus.text}</p>
+      <p class="fs-5 col-md-8">Адрес: {data.game.address}</p>
+      <p class="fs-5 col-md-8">тип: {data.game.type}</p>
+
+
       {#if user}
-        {#if data.game.gameUsers && !data?.game?.gameUsers.find(x=>x.userId == user.data.id)}
+        {#if data.game.gameUsers && !data?.game?.gameUsers.find(x=>x.userId == user.data.id) && data.game.hostId != user.data.id}
           <div class="mb-5">
               <button class="btn btn-primary btn-lg px-4" on:click={join}>Присоединиться</button>
           </div>
@@ -258,11 +280,13 @@
         <h2 class="text-body-emphasis">Список игроков</h2>
         <ul class="list-unstyled ps-0">
           {#each data.game.gameUsers as item}
-          <li>
-            <a class="mb-1 text-white" href="/users/{item.userId}">
-              {item.user.nickName}
-            </a>
-          </li>
+            {#if item.status == gameUserStatus.Approved.id}
+            <li>
+              <a class="mb-1 text-white" href="/users/{item.userId}">
+                {item.user.nickName}
+              </a>
+            </li>
+            {/if}
           {/each}
         </ul>
       </div>
@@ -278,7 +302,7 @@
           <label for="points" class="form-label">Внесите ваши очки</label>
           <input bind:value={points} type="number" class="form-control" id="points" placeholder="" >
         </div>
-        <button type="button" class="btn btn-primary" on:click={savePoints}>
+        <button type="button" class="btn btn-light my-3" on:click={savePoints}>
           Сохранить
         </button>
       </div>
@@ -290,7 +314,7 @@
 <!-- Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-      <div class="modal-content">
+      <div class="modal-content substrate">
         <div class="modal-header">
           <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -355,6 +379,4 @@
         color: #fff;
         background-position: center!important;
     }
-
-
 </style>
