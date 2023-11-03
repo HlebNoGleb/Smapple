@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Smapple.DbContext;
+using Smapple.Extensions;
 using Smapple.Interfaces;
 using Smapple.Models;
 
@@ -28,7 +29,7 @@ public class AuthController : Controller
             var user = await _dbContext.Users.SingleAsync(
                 x =>
                     x.Email == login.Email &&
-                    x.Password == login.Password);
+                    x.Password == login.Password.GetHash());
 
             var token = _jwtGenerator.CreateToken(user);
             
@@ -55,6 +56,7 @@ public class AuthController : Controller
         }
         
         user.Role = RoleEnum.Simple;
+        user.Password = user.Password.GetHash();
         
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync();

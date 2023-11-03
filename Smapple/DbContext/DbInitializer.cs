@@ -1,3 +1,4 @@
+using Smapple.Extensions;
 using Smapple.Models;
 
 namespace Smapple.DbContext;
@@ -16,7 +17,7 @@ public static class DbInitializer
         context.Users.Add(new User()
         {
             Email = "admin@admin.com",
-            Password = "test",
+            Password = "test".GetHash(),
             Role = RoleEnum.Admin,
             IsVerified = true,
             NickName = "admin",
