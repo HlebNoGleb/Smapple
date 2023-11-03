@@ -247,7 +247,7 @@ public class GameController : Controller
         try
         {
             var game = await _db.Games
-                .Include(x => x.GameUsers.Where(x => x.UserId == userId && x.Status == GameUserStatusEnum.Pending))
+                .Include(x => x.GameUsers.Where(x => x.UserId == userId))
                 .Where(x => x.Id == gameId)
                 .SingleAsync();
 
