@@ -63,6 +63,14 @@
       imageUrl: ""
     }
 
+  function update() {
+    if (typeof window == "undefined") {
+      return;
+    }
+
+    location.reload();
+  }
+
   function submit() {
     alert(JSON.stringify(editGameForm));
     // send to server
@@ -121,13 +129,19 @@
             text: 'Игра началась',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
       }
 
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
     }
+
+
 
     async function endGame() {
       const response = await fetch(`/api/game/${$page.params.game}/counting`, {
@@ -145,10 +159,20 @@
             text: 'Игра завершилась. Начинайте подсчет очков',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
       }
 
       if (!response.ok) {
+        Swal.fire({
+            title: 'Ошибка',
+            text: 'Произошла ошибка',
+            icon: 'error',
+            confirmButtonText: 'Ок'
+          })
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
     }
@@ -169,12 +193,18 @@
             text: 'Игра завершена. Спасибо за игру',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
       }
 
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+
     }
 
     let points = 0;
@@ -201,6 +231,8 @@
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+      update()
   }
 
     async function savePoints() {
@@ -226,6 +258,8 @@
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+      update()
     }
 </script>
 

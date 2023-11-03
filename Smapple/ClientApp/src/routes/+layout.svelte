@@ -35,7 +35,6 @@
                   {#if user} {user.data.nickName} {:else} Аккаунт {/if}
                 </a>
                 <ul class="dropdown-menu">
-
                   {#if user}
                     <li><a class="dropdown-item" href="/account">Аккаунт</a></li>
                     <li><a class="dropdown-item" href="#" on:click={logout}>Выйти</a></li>

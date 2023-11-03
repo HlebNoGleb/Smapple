@@ -21,18 +21,20 @@
       },
     }
 
-    console.log(data)
-
-
-    function update() {
-      invalidate();
+    let userModel = {
+      history: [],
+      hosted: [],
     }
+
+    function init(params) {
+      userModel.history = data.user.gameUsers.filter(x=>x.status == gameUserStatus.Approved.id);
+      userModel.hosted = data.user.hostedGames;
+    }
+
+    init();
 
     function submit() {
         alert(JSON.stringify(userData));
-        // send to server
-        // if 200ok
-        update()
     }
 
     let userData = {
@@ -61,6 +63,8 @@
     function declineHost(user) {
       alert(`отказать пользователю ${user} как хосту`)
     }
+
+
 </script>
 
 <!--{#await promise}-->
@@ -85,22 +89,23 @@
       <div class="container">
 
         <div class="row g-5 my-3">
+          {#if userModel.history.length > 0}
           <div class="col-md-6">
-            <h2 class="text-body-emphasis">Список игр в которых он учавствовал</h2>
+            <h2 class="text-body-emphasis">История игр</h2>
             <ul class="list-unstyled ps-0">
-              {#each data.user?.gameUsers as gameUser}
-                {#if gameUser.status == gameUserStatus.Approved.id}
+              {#each userModel.history as history}
                 <li>
-                  <a class="mb-1" href="/games/{gameUser.game.id}">
-                    {gameUser.game.name}
+                  <a class="mb-1" href="/games/{history.game.id}">
+                    {history.game.name}
                   </a>
+                  <span>Очки: {history.userScore}</span>
                 </li>
-                {/if}
               {/each}
             </ul>
           </div>
-          <div class="col-md-6">
-            <h2 class="text-body-emphasis">Список игр в которые он подал заявки</h2>
+          {/if}
+          <!-- <div class="col-md-6">
+            <h2 class="text-body-emphasis">Заявки в игры</h2>
             <ul class="list-unstyled ps-0">
               {#each data.user?.gameUsers as gameUser}
                 {#if gameUser.status == gameUserStatus.Pending.id}
@@ -113,19 +118,18 @@
               {/each}
             </ul>
           </div>
-        </div>
-        <h1>Если пользователь хост</h1>
+        </div> -->
         <div class="row g-5 my-3">
           <div class="col-md-12">
-            {#if data.user.hostedGames}
-            <h2 class="text-body-emphasis">Список игр в которых он хост</h2>
+            {#if userModel.hosted.length > 0}
+            <h2 class="text-body-emphasis">История ведения игр</h2>
             <ul class="list-unstyled ps-0">
-              {#each data.user?.hostedGames as game}
+              {#each userModel.hosted as hosted}
               <li>
-                <a class="mb-1" href="/games/{game.id}">
-                  {game.name}
+                <a class="mb-1" href="/games/{hosted.id}">
+                  {hosted.name}
                 </a>
-                <ul class="list-unstyled ps-0">
+                <!-- <ul class="list-unstyled ps-0">
                   {#each [1,2,3,4] as user}
                   <li>
                     <a class="mb-1" href="/user/{user}"> users {user} </a>
@@ -137,7 +141,7 @@
                     </button>
                   </li>
                   {/each}
-                </ul>
+                </ul> -->
               </li>
               <hr>
               {/each}
@@ -145,8 +149,7 @@
             {/if}
           </div>
         </div>
-        <h1>Если пользователь админ</h1>
-        <div class="row g-5 my-3">
+        <!-- <div class="row g-5 my-3">
           <div class="col-md-12">
             <h2 class="text-body-emphasis">Список заявок на хоста </h2>
             <ul class="list-unstyled ps-0">
@@ -163,7 +166,7 @@
               {/each}
             </ul>
           </div>
-        </div>
+        </div> -->
         </div>
       </main>
 <!--{:catch error}-->
