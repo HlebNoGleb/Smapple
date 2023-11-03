@@ -129,14 +129,16 @@
             text: 'Игра началась',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
       }
 
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
-
-      update()
     }
 
 
@@ -157,7 +159,11 @@
             text: 'Игра завершилась. Начинайте подсчет очков',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
       }
 
       if (!response.ok) {
@@ -169,8 +175,6 @@
           })
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
-
-      update()
     }
 
     async function saveGame() {
@@ -189,14 +193,18 @@
             text: 'Игра завершена. Спасибо за игру',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
       }
 
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
 
-      update()
+
     }
 
     let points = 0;

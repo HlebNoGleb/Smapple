@@ -65,8 +65,11 @@
       text:'Игра создана',
       icon: 'success',
       confirmButtonText: 'Ок'
-    })
-    update()
+    }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
   }
 
   let addGameForm = {

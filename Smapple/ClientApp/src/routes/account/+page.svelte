@@ -75,8 +75,11 @@
             title: 'Отлично',
             icon: 'success',
             confirmButtonText: 'Ок'
-        })
-        update()
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
       }
 
       if (!response.ok) {
@@ -105,8 +108,11 @@
             title: 'Отлично',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
-        update()
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
 
       }
 
@@ -115,8 +121,6 @@
             title: 'Ошибка',
             icon: 'error',
             confirmButtonText: 'Ок'
-          }).then({
-
           })
 
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
@@ -138,8 +142,11 @@
             title: 'Отлично',
             icon: 'success',
             confirmButtonText: 'Ок'
-          })
-        update()
+          }).then((result) => {
+              if (result.isConfirmed) {
+                update()
+              }
+            })
 
       }
 
