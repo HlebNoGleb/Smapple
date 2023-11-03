@@ -63,6 +63,14 @@
       imageUrl: ""
     }
 
+  function update() {
+    if (typeof window == "undefined") {
+      return;
+    }
+
+    location.reload();
+  }
+
   function submit() {
     alert(JSON.stringify(editGameForm));
     // send to server
@@ -127,7 +135,11 @@
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+      update()
     }
+
+
 
     async function endGame() {
       const response = await fetch(`/api/game/${$page.params.game}/counting`, {
@@ -149,8 +161,16 @@
       }
 
       if (!response.ok) {
+        Swal.fire({
+            title: 'Ошибка',
+            text: 'Произошла ошибка',
+            icon: 'error',
+            confirmButtonText: 'Ок'
+          })
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+      update()
     }
 
     async function saveGame() {
@@ -175,6 +195,8 @@
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+      update()
     }
 
     let points = 0;
@@ -201,6 +223,8 @@
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+      update()
   }
 
     async function savePoints() {
@@ -226,6 +250,8 @@
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
+
+      update()
     }
 </script>
 

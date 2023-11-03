@@ -1,5 +1,6 @@
 <script>
 // @ts-nocheck
+  import { page } from "$app/stores";
   import { invalidate } from '$app/navigation';
   import Swal from 'sweetalert2'
   import { user } from "$lib/user"
@@ -33,7 +34,7 @@
     }
 
   function update() {
-    invalidate();
+    location.reload();
   }
 
   async function submit() {
@@ -50,16 +51,21 @@
     if (!response.ok) {
       if (response.code == 401) {
         Swal.fire({
-          title: 'Error!',
-          text: 'Do you want to continue',
+          title: 'Ошибка',
           icon: 'error',
-          confirmButtonText: 'Cool'
+          confirmButtonText: 'Ок'
         })
       }
       throw new Error(`HTTP error! status: ${response.status}.`);
 
     }
 
+    Swal.fire({
+      title: 'Отлично',
+      text:'Игра создана',
+      icon: 'success',
+      confirmButtonText: 'Ок'
+    })
     update()
   }
 
@@ -87,7 +93,9 @@
         {#each data.games as item}
             <div class="col">
                 <div class="card">
+                    {#if item.image}
                       <img src="{item.image}" class="card-img-bottom" alt="{item.id} - {item.name}">
+                    {/if}
                       <div class="card-body">
                         <div class="my-2">
                             <h5 class="card-title">{item.name}</h5>
