@@ -101,7 +101,7 @@
                     {/if}
                       <div class="card-body">
                         <div class="my-2">
-                            <h5 class="card-title">{item.name}</h5>
+                            <a href="/games/{item.id}"><h5>{item.name}</h5></a>
                             <a href="/users/{item?.host?.id}" class="card-text">Хост: {item?.host?.nickName}</a>
                             <p>{item.address}</p>
                         </div>

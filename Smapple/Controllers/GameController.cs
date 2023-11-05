@@ -142,7 +142,24 @@ public class GameController : Controller
         {
             var hostId = User.Id();
 
-            await ChangeGameStatus(id, hostId, GameStatusEnum.Closed);
+            var game = await _db.Games
+                .Include(x => x.GameUsers)
+                .ThenInclude(x => x.User)
+                .SingleAsync(x => x.Id == id && x.HostId == hostId);
+
+            foreach (var gameUser in game.GameUsers)
+            {
+                var user = gameUser.User;
+                user.Points += gameUser.UserScore;
+
+                _db.Users.Update(user);
+            }
+            
+            game.Status = GameStatusEnum.Closed;
+
+            _db.Games.Update(game);
+
+            await _db.SaveChangesAsync();
 
             return Ok();
         }

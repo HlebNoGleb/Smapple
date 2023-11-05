@@ -20,6 +20,25 @@
       },
     }
 
+let gameStatus = {
+  Opened: {
+    id: 0,
+    text: "Открытая"
+  },
+  InProgress: {
+    id: 1,
+    text: "В процессе"
+  },
+  CountingResults: {
+    id: 2,
+    text: "Подсчет очков"
+  },
+  Closed: {
+    id: 3,
+    text: "Закрытая"
+  },
+}
+
     let userModel = {
       myHistory: [],
       myHosted: [],
@@ -189,10 +208,14 @@
                 <a class="mb-1" href="/games/{history.game.id}">
                   {history.game.name}
                 </a>
-                <span>Очки: {history.userScore}</span>
-                <button type="button" class="btn btn-danger" on:click={() => {removeUserFromGame(history.game.id, user?.data.id)}}>
-                    Отменить участие в игре
-                </button>
+                {#if history.game.status == gameStatus.Closed.id}
+                  <span>Очки: {history.userScore}</span>
+                {/if}
+                {#if history.game.status == gameStatus.Opened.id}
+                  <button type="button" class="btn btn-danger" on:click={() => {removeUserFromGame(history.game.id, user?.data.id)}}>
+                      Отменить участие в игре
+                  </button>
+                {/if}
               </li>
             {/each}
           </ul>
@@ -209,7 +232,7 @@
                 </a>
                 <span>Очки: {application.userScore}</span>
                 <button type="button" class="btn btn-danger" on:click={() => {removeUserFromGame(application.gameId, application.userId)}}>
-                    Отменить заявку {application.userId}. Игра {application.gameId}
+                    Отменить заявку.
                 </button>
               </li>
             {/each}
@@ -232,14 +255,14 @@
                   <a class="mb-1" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a>
                   {#if gameUser.status == gameUserStatus.Approved.id}
                   <button type="button" class="btn btn-danger" on:click={() => {removeUserFromGame(gameUser.gameId, gameUser.userId)}}>
-                    Удалить игрока {gameUser.userId}. Игра {gameUser.gameId}
+                    Удалить игрока.
                   </button>
                   {:else if gameUser.status == gameUserStatus.Pending.id}
                   <button type="button" class="btn btn-light" on:click={() => {acceptUserToGame(gameUser.gameId, gameUser.userId)}}>
-                    Принять заявку игрока {gameUser.userId}. Игра {gameUser.gameId}
+                    Принять заявку.
                   </button>
                   <button type="button" class="btn btn-danger" on:click={() => {declineUserToGame(gameUser.gameId, gameUser.userId)}}>
-                    Отклонить заявку игрока {gameUser.userId}. Игра {gameUser.gameId}
+                    Отклонить заявку.
                   </button>
                   {/if}
                 </li>

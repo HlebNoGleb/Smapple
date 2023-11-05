@@ -319,6 +319,9 @@
               <a class="mb-1 text-white" href="/users/{item.userId}">
                 {item.user.nickName}
               </a>
+              {#if currentStatus.id == gameStatus.CountingResults.id || currentStatus.id == gameStatus.Closed.id}
+                <span>Очки за игру: {item.userScore}</span>
+              {/if}
             </li>
             {/if}
           {/each}
@@ -330,7 +333,7 @@
     </div>
   </div>
   <div class="row g-5 my-3">
-    {#if currentStatus.id == gameStatus.CountingResults.id}
+    {#if currentStatus.id == gameStatus.CountingResults.id && data?.game?.gameUsers.find(x=>x.userId == user.data.id)}
       <div class="col-md-6">
         <div class="col-sm-6">
           <label for="points" class="form-label">Внесите ваши очки</label>
