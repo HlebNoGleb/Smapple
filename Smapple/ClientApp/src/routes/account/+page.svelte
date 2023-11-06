@@ -44,12 +44,6 @@
         }
     })
 
-
-
-    function submit() {
-        alert(JSON.stringify(userData));
-    }
-
     async function acceptUserToGame(gameId, userId) {
       const response = await fetch(`/api/game/${gameId}/submitUser/${userId}`, {
         method: 'POST',
@@ -161,9 +155,9 @@
         <p class="fs-5 col-md-8">{data.me.email}</p>
         <hr class="col-3 col-md-2 mb-5">
           <div class="my-3">
-            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            <!-- <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#exampleModal">
               Изменить данные
-            </button>
+            </button> -->
           </div>
       </div>
     </div>
@@ -312,7 +306,7 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content substrate">
       <div class="modal-header">
@@ -333,15 +327,15 @@
                 </div>
 
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="submit" class="btn btn-primary">Save changes</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                  <button type="submit" class="btn btn-primary">Сохранить</button>
                 </div>
             </form>
       </div>
 
     </div>
   </div>
-</div>
+</div> -->
 
 {/if}
 

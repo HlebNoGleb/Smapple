@@ -18,12 +18,13 @@
 
 
     let editGameForm = {
-      title: "",
-      datetime: null,
-      slots: 0,
-      address: "",
-      type: "0",
-      imageUrl: ""
+      title: data.game.name || "",
+      datetime: data.game.gameDateTime || null,
+      slots: data.game.slotsCount || 0,
+      address: data.game.address || "",
+      type: `${data.game.type}` || "0",
+      imageUrl: data.game.image || "",
+      hostId: data.game.hostId
     }
 
     function update() {
@@ -34,11 +35,33 @@
       location.reload();
     }
 
-    function submit() {
-      alert(JSON.stringify(editGameForm));
-      // send to server
-      // if 200ok
-      update()
+    async function submit() {
+      const response = await fetch(`/api/game/${$page.params.game}`, {
+        method: 'PUT',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+        body: JSON.stringify(editGameForm)
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          title: 'Отлично',
+          text: 'Данные игры обновлены',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
+      }
+
+      if (!response.ok) {
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
     }
 
     function setYandexMaps(node) {
@@ -439,8 +462,8 @@
                   </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save changes</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="submit" class="btn btn-primary">Сохранить</button>
                   </div>
               </form>
         </div>
