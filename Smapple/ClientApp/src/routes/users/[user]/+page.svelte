@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 // @ts-nocheck
     import { page } from "$app/stores";
     import { invalidate } from '$app/navigation';
@@ -27,8 +27,8 @@
     }
 
     function init(params) {
-      userModel.history = data.user.gameUsers.filter(x=>x.status == gameUserStatus.Approved.id);
-      userModel.hosted = data.user.hostedGames;
+      userModel.history = data.user.gameUsers ? data?.user?.gameUsers.filter(x=>x.status == gameUserStatus.Approved.id) : [];
+      userModel.hosted = data?.user?.hostedGames || [];
     }
 
     init();

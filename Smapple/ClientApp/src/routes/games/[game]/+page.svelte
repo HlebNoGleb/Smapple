@@ -1,58 +1,21 @@
-<svelte:head>
-    <!-- <script src="https://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script> -->
-</svelte:head>
-
 <script lang="ts">
 // @ts-nocheck
     import Swal from 'sweetalert2'
     import { page } from "$app/stores";
     import { user } from "$lib/user"
+    import { gameStatus, gameUserStatus, gameTypes } from '$lib/enums.js';
 
     export let data;
 
+    console.log(data);
 
-    console.log(data)
+    const currentStatus = Object.values(gameStatus).find(x => x.id == data.game.status);
+    const gameType = Object.values(gameTypes).find(x => x.id == data.game.type);
+    const isOpenGame = gameType.id == gameTypes.Public.id;
+    const isUserInGame = data.game.gameUsers.find(x => x.userId == user?.data.id) != undefined;
+    const isUserHost = data.game.hostId == user?.data.id;
+    let userScore = data?.game?.gameUsers.find(x=>x.userId == user?.data.id)?.userScore || 0;
 
-    // console.log(user?.data)
-    // console.log(data.game)
-
-    let gameStatus = {
-      Opened: {
-        id: 0,
-        text: "Открытая"
-      },
-      InProgress: {
-        id: 1,
-        text: "В процессе"
-      },
-      CountingResults: {
-        id: 2,
-        text: "Подсчет очков"
-      },
-      Closed: {
-        id: 3,
-        text: "Закрытая"
-      },
-    }
-
-    let gameUserStatus = {
-      Pending: {
-        id: 0,
-        text: "Запрос"
-      },
-      Approved: {
-        id: 1,
-        text: "Подтвержден"
-      },
-      Declined: {
-        id: 2,
-        text: "Запрещен"
-      },
-    }
-
-    let currentStatus = Object.values(gameStatus).find(x=>x.id == data.game.status);
-
-    console.log(currentStatus)
 
     let editGameForm = {
       title: "",
@@ -63,53 +26,50 @@
       imageUrl: ""
     }
 
-  function update() {
-    if (typeof window == "undefined") {
-      return;
+    function update() {
+      if (typeof window == "undefined") {
+        return;
+      }
+
+      location.reload();
     }
 
-    location.reload();
-  }
-
-  function submit() {
-    alert(JSON.stringify(editGameForm));
-    // send to server
-    // if 200ok
-    update()
-  }
+    function submit() {
+      alert(JSON.stringify(editGameForm));
+      // send to server
+      // if 200ok
+      update()
+    }
 
     function setYandexMaps(node) {
-        try {
-            console.log(node)
-            ymaps.ready(init);
-            const lat = node.getAttribute("data-lat")
-            const long = node.getAttribute("data-long")
-            const name = node.getAttribute("data-name")
+      try {
+        console.log(node)
+        ymaps.ready(init);
+        const lat = node.getAttribute("data-lat")
+        const long = node.getAttribute("data-long")
+        const name = node.getAttribute("data-name")
 
 
-                function init () {
-                    var myMap = new ymaps.Map('map',
-                    {
-                        center: [lat, long],
-                        zoom: 15,
-                        controls: ["zoomControl", "fullscreenControl"]
-                    });
+        function init() {
+          var myMap = new ymaps.Map('map', {
+            center: [lat, long],
+            zoom: 15,
+            controls: ["zoomControl", "fullscreenControl"]
+          });
 
-                    var pin = new ymaps.Placemark(
-                    [parseFloat(lat), parseFloat(long)],
-                    {
-                        iconCaption: name
-                    },
-                    {
-                        openBalloonOnClick: false,
-                        preset: 'islands#blueCircleDotIcon'
-                    });
+          var pin = new ymaps.Placemark(
+            [parseFloat(lat), parseFloat(long)], {
+              iconCaption: name
+            }, {
+              openBalloonOnClick: false,
+              preset: 'islands#blueCircleDotIcon'
+            });
 
-                    myMap.geoObjects.add(pin);
-                }
-        } catch (error) {
-            console.log(error)
+          myMap.geoObjects.add(pin);
         }
+      } catch (error) {
+        console.log(error)
+      }
 
     }
 
@@ -125,23 +85,21 @@
 
       if (response.ok) {
         Swal.fire({
-            title: 'Отлично',
-            text: 'Игра началась',
-            icon: 'success',
-            confirmButtonText: 'Ок'
-          }).then((result) => {
-              if (result.isConfirmed) {
-                update()
-              }
-            })
+          title: 'Отлично',
+          text: 'Игра началась',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
       }
 
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
     }
-
-
 
     async function endGame() {
       const response = await fetch(`/api/game/${$page.params.game}/counting`, {
@@ -155,24 +113,24 @@
 
       if (response.ok) {
         Swal.fire({
-            title: 'Отлично',
-            text: 'Игра завершилась. Начинайте подсчет очков',
-            icon: 'success',
-            confirmButtonText: 'Ок'
-          }).then((result) => {
-              if (result.isConfirmed) {
-                update()
-              }
-            })
+          title: 'Отлично',
+          text: 'Игра завершилась. Начинайте подсчет очков',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
       }
 
       if (!response.ok) {
         Swal.fire({
-            title: 'Ошибка',
-            text: 'Произошла ошибка',
-            icon: 'error',
-            confirmButtonText: 'Ок'
-          })
+          title: 'Ошибка',
+          text: 'Произошла ошибка',
+          icon: 'error',
+          confirmButtonText: 'Ок'
+        })
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
     }
@@ -189,15 +147,15 @@
 
       if (response.ok) {
         Swal.fire({
-            title: 'Отлично',
-            text: 'Игра завершена. Спасибо за игру',
-            icon: 'success',
-            confirmButtonText: 'Ок'
-          }).then((result) => {
-              if (result.isConfirmed) {
-                update()
-              }
-            })
+          title: 'Отлично',
+          text: 'Игра завершена. Спасибо за игру',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
       }
 
       if (!response.ok) {
@@ -206,8 +164,6 @@
 
 
     }
-
-    let points = 0;
 
     async function join() {
       const response = await fetch(`/api/game/${$page.params.game}/createApplication`, {
@@ -221,19 +177,91 @@
 
       if (response.ok) {
         Swal.fire({
-            title: 'Отлично',
-            text: 'Вы присоеденились к игре',
-            icon: 'success',
-            confirmButtonText: 'Ок'
-          })
+          title: 'Отлично',
+          text: 'Вы присоеденились к игре',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
       }
 
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
 
-      update()
-  }
+    }
+
+    async function removeUserFromGame(gameId, userId) {
+
+      const response = await fetch(`/api/game/${gameId}/removeUser/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          title: 'Отлично',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
+
+      }
+
+      if (!response.ok) {
+        Swal.fire({
+          title: 'Ошибка',
+          icon: 'error',
+          confirmButtonText: 'Ок'
+        })
+
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
+    }
+
+    async function declineUserToGame(gameId, userId) {
+      const response = await fetch(`/api/game/${gameId}/declineuser/${userId}`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        },
+      });
+
+      if (response.ok) {
+        Swal.fire({
+          title: 'Отлично',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
+
+      }
+
+      if (!response.ok) {
+        Swal.fire({
+          title: 'Ошибка',
+          icon: 'error',
+          confirmButtonText: 'Ок'
+        })
+
+        throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
+      }
+    }
 
     async function savePoints() {
       const response = await fetch(`/api/game/${$page.params.game}/addPoints`, {
@@ -243,23 +271,25 @@
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.token}`
         },
-        body:points
+        body: userScore
       });
 
       if (response.ok) {
         Swal.fire({
-            title: 'Отлично',
-            text: 'Ваши очки сохранены',
-            icon: 'success',
-            confirmButtonText: 'Ок'
-          })
+          title: 'Отлично',
+          text: 'Ваши очки сохранены',
+          icon: 'success',
+          confirmButtonText: 'Ок'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            update()
+          }
+        })
       }
 
       if (!response.ok) {
         throw new Error(`responce error.status: ${response.status}. ${response.statusText}`);
       }
-
-      update()
     }
 </script>
 
@@ -267,17 +297,24 @@
 <main>
   <div class="game" style="background:linear-gradient(0deg, rgba(0,0,0,.7), rgba(0,0,0,.7)), url({data.game.image});">
 <div class="container">
-      <h1 class="text-body-emphasis">{data.game.name}</h1>
+      <h1 class="text-body-emphasis">{data.game.name}  {#if data.game.type == gameTypes.Private.id}&#128274;{/if}</h1>
       <p class="fs-5 col-md-8">{new Date(data.game.gameDateTime).toLocaleDateString()} - {new Date(data.game.gameDateTime).toLocaleTimeString()}</p>
-      <p class="fs-5 col-md-8">Статус: {currentStatus.text}</p>
+      <p class="fs-5 badge rounded-pill {currentStatus?.cssClass}">Статус: {currentStatus.text}</p>
       <p class="fs-5 col-md-8">Адрес: {data.game.address}</p>
-      <p class="fs-5 col-md-8">тип: {data.game.type}</p>
-
-
       {#if user}
-        {#if data.game.gameUsers && !data?.game?.gameUsers.find(x=>x.userId == user.data.id) && data.game.hostId != user.data.id}
+        {#if !isUserInGame && !isUserHost}
           <div class="mb-5">
               <button class="btn btn-primary btn-lg px-4" on:click={join}>Присоединиться</button>
+          </div>
+        {/if}
+        {#if isUserInGame && isOpenGame && currentStatus.id == gameStatus.Opened.id}
+          <div class="mb-5">
+              <button class="btn btn-danger btn-lg px-4" on:click={() => {declineUserToGame(data.game.id, user?.data.id)}}>Выйти из игры</button>
+          </div>
+        {/if}
+        {#if isUserInGame && !isOpenGame && currentStatus.id == gameStatus.Opened.id}
+          <div class="mb-5">
+              <button class="btn btn-danger btn-lg px-4" on:click={() => {removeUserFromGame(data.game.id, user?.data.id)}}>Отменить заявку</button>
           </div>
         {/if}
       {/if}
@@ -303,7 +340,6 @@
           {/if}
           </div>
         {/if}
-      <hr class="col-3 col-md-2 mb-5">
       </div>
   </div>
   <div class="container">
@@ -323,6 +359,12 @@
                 <span>Очки за игру: {item.userScore}</span>
               {/if}
             </li>
+            {:else}
+            <li>
+              <a class="mb-1 text-white-50" href="/users/{item.userId}">
+                {item.user.nickName}
+              </a>
+            </li>
             {/if}
           {/each}
         </ul>
@@ -333,11 +375,11 @@
     </div>
   </div>
   <div class="row g-5 my-3">
-    {#if currentStatus.id == gameStatus.CountingResults.id && data?.game?.gameUsers.find(x=>x.userId == user.data.id)}
+    {#if currentStatus.id == gameStatus.CountingResults.id && data?.game?.gameUsers.find(x=>x.userId == user?.data.id)}
       <div class="col-md-6">
         <div class="col-sm-6">
           <label for="points" class="form-label">Внесите ваши очки</label>
-          <input bind:value={points} type="number" class="form-control" id="points" placeholder="" >
+          <input bind:value={userScore} type="number" class="form-control" id="points" placeholder="" >
         </div>
         <button type="button" class="btn btn-light my-3" on:click={savePoints}>
           Сохранить

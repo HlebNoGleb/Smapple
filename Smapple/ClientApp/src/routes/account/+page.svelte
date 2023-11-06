@@ -1,55 +1,26 @@
-<script>
+<script lang="ts">
 // @ts-ignore
     import Swal from 'sweetalert2'
     import { onMount } from 'svelte';
     import { user } from "$lib/user"
+    import { gameStatus, gameUserStatus } from '$lib/enums.js';
     export let data;
-
-    let gameUserStatus = {
-      Pending: {
-        id: 0,
-        text: "Запрос"
-      },
-      Approved: {
-        id: 1,
-        text: "Подтвержден"
-      },
-      Declined: {
-        id: 2,
-        text: "Запрещен"
-      },
-    }
-
-let gameStatus = {
-  Opened: {
-    id: 0,
-    text: "Открытая"
-  },
-  InProgress: {
-    id: 1,
-    text: "В процессе"
-  },
-  CountingResults: {
-    id: 2,
-    text: "Подсчет очков"
-  },
-  Closed: {
-    id: 3,
-    text: "Закрытая"
-  },
-}
 
     let userModel = {
       myHistory: [],
-      myHosted: [],
-      myApplications: [],
+      myOpenHosted: [],
+      myClosedHosted: [],
+      myPendingApplications: [],
+      myDeclinedApplications: []
     }
 
     function init() {
-      userModel.myHistory = data.me?.gameUsers?.filter(x=>x.status == gameUserStatus.Approved.id) ?? [];
-      userModel.myHosted = data.me.hostedGames ?? [];
-      userModel.myApplications = data.me?.gameUsers?.filter(x=>x.status == gameUserStatus.Pending.id) ?? [];
-      console.log(data.me, userModel)
+      userModel.myHistory = data.me?.gameUsers?.filter(x=>x.status == gameUserStatus.Approved.id && x.game.status == gameStatus.Closed.id) ?? [];
+      userModel.myOpenHosted = data.me.hostedGames.filter(x=>x.status != gameStatus.Closed.id) ?? [];
+      userModel.myClosedHosted = data.me.hostedGames.filter(x=>x.status == gameStatus.Closed.id) ?? [];
+      userModel.myPendingApplications = data.me?.gameUsers?.filter(x=>x.status == gameUserStatus.Pending.id) ?? [];
+      userModel.myDeclinedApplications = data.me?.gameUsers?.filter(x=>x.status == gameUserStatus.Declined.id) ?? [];
+      console.log(data.me, userModel);
     }
 
     function update() {
@@ -181,7 +152,7 @@ let gameStatus = {
     }
 
 </script>
-{#if data.me}
+{#if data?.me}
 <main>
     <div class="user">
       <div class="container">
@@ -201,7 +172,7 @@ let gameStatus = {
       <div class="row g-5 my-3">
         {#if userModel.myHistory.length > 0}
         <div class="col-md-6">
-          <h2 class="text-body-emphasis">История игр</h2>
+          <h2 class="text-body-emphasis">Мои прошедшие игры</h2>
           <ul class="list-unstyled ps-0">
             {#each userModel.myHistory as history}
               <li>
@@ -211,21 +182,21 @@ let gameStatus = {
                 {#if history.game.status == gameStatus.Closed.id}
                   <span>Очки: {history.userScore}</span>
                 {/if}
-                {#if history.game.status == gameStatus.Opened.id}
+                <!-- {#if history.game.status == gameStatus.Opened.id}
                   <button type="button" class="btn btn-danger" on:click={() => {removeUserFromGame(history.game.id, user?.data.id)}}>
                       Отменить участие в игре
                   </button>
-                {/if}
+                {/if} -->
               </li>
             {/each}
           </ul>
         </div>
         {/if}
-        {#if userModel.myApplications.length > 0}
+        {#if userModel.myPendingApplications.length > 0}
         <div class="col-md-6">
-          <h2 class="text-body-emphasis">Заявки</h2>
+          <h2 class="text-body-emphasis">Мои заявки</h2>
           <ul class="list-unstyled ps-0">
-            {#each userModel.myApplications as application}
+            {#each userModel.myPendingApplications as application}
               <li>
                 <a class="mb-1" href="/games/{application.game.id}">
                   {application.game.name}
@@ -239,20 +210,37 @@ let gameStatus = {
           </ul>
         </div>
         {/if}
-      <div class="row g-5 my-3">
-        <div class="col-md-12">
-          {#if userModel.myHosted.length > 0}
-          <h2 class="text-body-emphasis">История ведения игр</h2>
+        {#if userModel.myDeclinedApplications.length > 0}
+        <div class="col-md-6">
+          <h2 class="text-body-emphasis">Мои отклоненные заявки</h2>
           <ul class="list-unstyled ps-0">
-            {#each userModel.myHosted as hosted}
+            {#each userModel.myDeclinedApplications as application}
+              <li>
+                <a class="mb-1" href="/games/{application.game.id}">
+                  {application.game.name}
+                </a>
+                <span>Очки: {application.userScore}</span>
+              </li>
+            {/each}
+          </ul>
+        </div>
+        {/if}
+      <div class="row g-5 my-3">
+        <div class="col-md-6">
+          {#if userModel.myOpenHosted.length > 0}
+          <h2 class="text-body-emphasis">Предстоящие игры</h2>
+          <ul class="list-unstyled ps-0">
+            {#each userModel.myOpenHosted as hosted}
             <li>
               <a class="mb-1" href="/games/{hosted.id}">
                 {hosted.name}
               </a>
-              <ul class="list-unstyled ps-0">
+              <ul class="list-unstyled ps-0 mx-2">
                 {#each hosted.gameUsers as gameUser}
                 <li>
                   <a class="mb-1" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a>
+                  <span>{Object.values(gameUserStatus).find(x=>x.id == gameUser.status)?.text}</span>
+                  <span>Очки: {gameUser.userScore}</span>
                   {#if gameUser.status == gameUserStatus.Approved.id}
                   <button type="button" class="btn btn-danger" on:click={() => {removeUserFromGame(gameUser.gameId, gameUser.userId)}}>
                     Удалить игрока.
@@ -265,6 +253,29 @@ let gameStatus = {
                     Отклонить заявку.
                   </button>
                   {/if}
+                </li>
+                {/each}
+              </ul>
+            </li>
+            <hr>
+            {/each}
+          </ul>
+          {/if}
+        </div>
+        <div class="col-md-6">
+          {#if userModel.myClosedHosted.length > 0}
+          <h2 class="text-body-emphasis">Прошедшие игры</h2>
+          <ul class="list-unstyled ps-0">
+            {#each userModel.myClosedHosted as hosted}
+            <li>
+              <a class="mb-1" href="/games/{hosted.id}">
+                {hosted.name}
+              </a>
+              <ul class="list-unstyled ps-0 mx-2">
+                {#each hosted.gameUsers as gameUser}
+                <li>
+                  <a class="mb-1" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a>
+                  <span>Очки: {gameUser.userScore}</span>
                 </li>
                 {/each}
               </ul>

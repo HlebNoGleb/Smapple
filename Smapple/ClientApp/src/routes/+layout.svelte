@@ -23,18 +23,18 @@
               <div class="row" style="width: 100%;">
 
                 <div class="col-auto nav-item">
-                  <a class="nav-link" href="/games">Games</a>
+                  <a class="nav-link" href="/games">Игры</a>
                 </div>
 
                 <div class="col-auto nav-item">
-                  <a class="nav-link" href="/users">Users</a>
+                  <a class="nav-link" href="/users">Игроки</a>
                 </div>
               </div>
               <div class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   {#if user} {user.data.nickName} {:else} Аккаунт {/if}
                 </a>
-                <ul class="dropdown-menu">
+                <ul class="dropdown-menu dropdown-menu-end">
                   {#if user}
                     <li><a class="dropdown-item" href="/account">Аккаунт</a></li>
                     <li><a class="dropdown-item" href="#" on:click={logout}>Выйти</a></li>

@@ -4,34 +4,15 @@
   import { invalidate } from '$app/navigation';
   import Swal from 'sweetalert2'
   import { user } from "$lib/user"
+  import { gameTypes, gameUserStatus } from "$lib/enums.js";
 
   export let data;
-
-  let gameTypes = [
-    { id: 0, text: `Открытая` },
-    { id: 1, text: `Закрытая` },
-  ];
 
   let roles = [
     {id: 0, text: "Хост"},
     {id: 1, text: "Игрок"},
     {id: 2, text: "Админ"}
   ]
-
-  let gameUserStatus = {
-      Pending: {
-        id: 0,
-        text: "Запрос"
-      },
-      Approved: {
-        id: 1,
-        text: "Подтвержден"
-      },
-      Declined: {
-        id: 2,
-        text: "Запрещен"
-      },
-    }
 
   function update() {
     location.reload();
@@ -101,7 +82,7 @@
                     {/if}
                       <div class="card-body">
                         <div class="my-2">
-                            <a href="/games/{item.id}"><h5>{item.name}</h5></a>
+                            <a href="/games/{item.id}"><h5>{item.name} {#if item.type == gameTypes.Private.id}&#128274;{/if}</h5></a>
                             <a href="/users/{item?.host?.id}" class="card-text">Хост: {item?.host?.nickName}</a>
                             <p>{item.address}</p>
                         </div>
@@ -116,6 +97,8 @@
                                   {#each item?.gameUsers as gameUser}
                                     {#if gameUser.status == gameUserStatus.Approved.id}
                                       <li><a class="dropdown-item" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a></li>
+                                    {:else}
+                                      <li><a class="dropdown-item text-white-50" href="/users/{gameUser.user.id}">{gameUser.user.nickName}</a></li>
                                     {/if}
                                   {/each}
                                 </ul>
@@ -184,7 +167,8 @@
                   <div class="col-12">
                     <label for="country" class="form-label">Тип игры</label>
                     <select bind:value={addGameForm.type}>
-                      {#each gameTypes as type}
+                      {#each Object.values(gameTypes) as type}
+                      {JSON.stringify(type)}
                         <option value={type.id}>
                             {type.text}
                         </option>
