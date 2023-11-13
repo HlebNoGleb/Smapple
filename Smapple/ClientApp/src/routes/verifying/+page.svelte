@@ -9,9 +9,14 @@
 
 <main>
   {#if data.isVeryfied}
-    <div>Ваш аккаунт успешно верифицирован</div>
+    <div class="text-center">
+      <h1 class="display-6 fw-bold text-body-emphasis">✅ Ваш аккаунт успешно верифицирован</h1>
+      <a href="/signin" type="button" class="btn btn-light btn-lg px-4 gap-3">Войти</a>
+    </div>
   {:else}
-    <div>Ошибка</div>
+    <div class="text-center">
+      <h1 class="display-6 fw-bold text-body-emphasis">❌ Ошибка</h1>
+    </div>
   {/if}
 </main>
 
@@ -21,8 +26,5 @@
       background-size: cover!important;
       padding: 20px;
       color: #fff;
-  }
-  a{
-    color:#fff
   }
 </style>
