@@ -43,10 +43,22 @@
             body: JSON.stringify(signIn)
         })
         .then(function (response) {
-            return response.json();
+            console.log(response);
+            if(response.status == 403){
+                Swal.fire({
+                    title: 'Your account is not verificated',
+                    text: "Check your email and verify account",
+                    icon: 'warning',
+                    confirmButtonText: 'ok'
+                })
+                
+                return null;
+            } else {
+                return response.json();
+            }
         })
         .then(function (result) {
-            if (result.user && result.token) {
+            if (result != null && result.user && result.token) {
                 localStorage.setItem('user', JSON.stringify(result.user))
                 localStorage.setItem('token', result.token)
                 location.href = '/games'

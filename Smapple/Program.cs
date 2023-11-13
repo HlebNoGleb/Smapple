@@ -21,6 +21,8 @@ builder.Services.AddDbContext<SmappleDbContext>(options => options.UseMySQL("Hos
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddSingleton<IJwtGenerator, JwtGenerator>();
+builder.Services.AddSingleton<MailService>();
+builder.Services.AddSingleton<VerifyingUserService>();
 
 var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
